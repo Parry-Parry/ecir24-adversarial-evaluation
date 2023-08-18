@@ -3,6 +3,7 @@ if not pt.started():
     pt.init()
 import pandas as pd
 import os
+from os.path import join
 
 def build_rank_lookup(df, score_col='score'):
     frame = {}
@@ -22,7 +23,7 @@ def get_rank_change(qid, docno, score, lookup):
     rank_change = old_rank[0] - [i for i, item in enumerate(new_ranks) if item[0]==docno][0]
     return rank_change
 
-def main(run_file : str, output_file : str):
+def main(run_file : str, output_file : str, res_dump : str = None):
     res = pd.read_csv(run_file, sep='\t', index_col=False)
     lookup = build_rank_lookup(res)
     res['rank_change'] = res.apply(lambda row : get_rank_change(row.qid, row.docno, row.augmented_score, lookup), axis=1)
@@ -31,6 +32,11 @@ def main(run_file : str, output_file : str):
     mrc = res['rank_change'].mean()
     success = res['success'].mean()
     run = os.path.basename(run_file)
+    name = run.replace('.tsv', '')
+    if res_dump is not None:
+        sub = res[['qid', 'docno', 'rank_change', 'success']]
+        sub.to_csv(join(res_dump, f'{name}_rank_changes.tsv'), sep='\t', index=False)
+
     with open(output_file, 'a') as f:
         f.write(f'{run}{mrc}\t{success}\n')
 
