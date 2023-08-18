@@ -1,4 +1,5 @@
 import numpy as np
+
 class Syringe:
     def __init__(self, mode='random', seed=42):
         self.mode = mode

@@ -13,7 +13,7 @@ def main(index_dataset : str, eval_set : str, text_lookup : str, output_file : s
     num_cpus = mp.cpu_count()
     bm25 = ptp.PisaIndex.from_dataset(index_dataset, threads=num_cpus).bm25(num_results=budget) >> pt.get_text(index, 'text')
 
-    topics = pd.DataFrame(eval_set.queries_iter(), columns=['qid', 'query'])
+    topics = pd.DataFrame(eval_set.queries_iter(), columns=['query_id', 'query']).rename(columns={'query_id' : 'qid'})
 
     run = bm25.transform(topics)
     run.to_csv(output_file, sep='\t', index=False, header=True)
