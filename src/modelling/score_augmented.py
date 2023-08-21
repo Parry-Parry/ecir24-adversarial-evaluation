@@ -5,6 +5,8 @@ if not pt.started():
 from types import SimpleNamespace
 import torch
 import pandas as pd
+import os
+from os.path import join
 
 def init_electra(hparams):
     from pyterrier_dr import ElectraScorer
@@ -39,8 +41,11 @@ def main(run_file : str,
     res = pd.read_csv(run_file, sep='\t', index_col=False)
     res = reranker.transform(res)
     res['augmented_score'] = res['score']
-    res['text'] = res['text_0']
-    res = reranker.transform(res)
+
+    if not os.path.exists(join(os.path.dirname(output_file), 'normal_{hparams.model}.tsv')):
+        res['text'] = res['text_0']
+        res = reranker.transform(res)
+        res.to_csv(join(os.path.dirname(output_file), f'normal_{hparams.model}.tsv'), sep='\t', index=False, header=True)
 
     res.to_csv(output_file, sep='\t', index=False, header=True)
 

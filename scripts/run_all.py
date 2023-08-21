@@ -21,6 +21,8 @@ def main(script : str, run_dir : str, output_dir : str, batch_size : int = 128):
             args = main_args.copy()
             output_file = os.path.join(output_dir, f'{file.replace(".tsv", "")}_{name}.tsv')
             if os.path.exists(output_file):
+                print('Skipping ', output_file, ' as it already exists')
+                progress_bar.update(1)
                 continue
             args.extend(['--run_file', os.path.join(run_dir, file)])
             args.extend(['--output_file', output_file])
