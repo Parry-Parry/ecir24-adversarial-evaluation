@@ -1,6 +1,7 @@
 from fire import Fire
 import subprocess as sp 
 import os
+from tqdm import tqdm
 
 MODELS = {
     't5' : 'castorini/monot5-base-msmarco',
@@ -11,6 +12,10 @@ def main(script : str, run_dir : str, output_dir : str):
     main_args = ['python', script]
     files = [f for f in os.listdir(run_dir) if f.endswith('.tsv')]
 
+    total = len(files) * len(MODELS)
+
+    progress_bar = tqdm(total=total)
+
     for file in files:
         for name, ckpt in MODELS.items(): 
             args = main_args.copy()
@@ -20,6 +25,7 @@ def main(script : str, run_dir : str, output_dir : str):
             args.extend(['--model', name])
             args.extend(['--model_name_or_path', ckpt])
             sp.run(args)
+            progress_bar.update(1)
 
     return "Done!"
 
