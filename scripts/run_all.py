@@ -8,7 +8,7 @@ MODELS = {
     't5' : 'castorini/monot5-base-msmarco',
 }
 
-def main(script : str, run_dir : str, output_dir : str):
+def main(script : str, run_dir : str, output_dir : str, batch_size : int = 128):
     main_args = ['python', script]
     files = [f for f in os.listdir(run_dir) if f.endswith('.tsv')]
 
@@ -20,10 +20,13 @@ def main(script : str, run_dir : str, output_dir : str):
         for name, ckpt in MODELS.items(): 
             args = main_args.copy()
             output_file = os.path.join(output_dir, f'{file.replace(".tsv", "")}_{name}.tsv')
+            if os.path.exists(output_file):
+                continue
             args.extend(['--run_file', os.path.join(run_dir, file)])
             args.extend(['--output_file', output_file])
             args.extend(['--model', name])
             args.extend(['--model_name_or_path', ckpt])
+            args.extend(['--batch_size', str(batch_size)])
             sp.run(args)
             progress_bar.update(1)
 
