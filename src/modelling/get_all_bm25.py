@@ -11,7 +11,7 @@ def main(index_dataset : str, eval_set : str, text_lookup : str, output_file : s
     index = pt.get_dataset(text_lookup)
     eval_set = irds.load(eval_set)
     num_cpus = mp.cpu_count()
-    bm25 = ptp.PisaIndex.from_dataset(index_dataset, threads=num_cpus).bm25(num_results=budget) >> pt.get_text(index, 'text')
+    bm25 = ptp.PisaIndex.from_dataset(index_dataset, threads=num_cpus).bm25(num_results=budget) >> pt.text.get_text(index, 'text')
 
     topics = pd.DataFrame(eval_set.queries_iter(), columns=['query_id', 'query']).rename(columns={'query_id' : 'qid'})
 
