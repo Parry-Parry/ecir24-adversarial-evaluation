@@ -14,4 +14,5 @@ Columns:
 * query : string, query text
 * docno : string, doc_id
 * score : float, bm25 score
+* rank : integer, automated terrier rank
 * text : string, document text
