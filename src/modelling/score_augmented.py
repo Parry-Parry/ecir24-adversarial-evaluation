@@ -43,3 +43,7 @@ def main(run_file : str,
     res = reranker.transform(res)
 
     res.to_csv(output_file, sep='\t', index=False, header=True)
+
+if __name__ == '__main__':
+    import fire
+    fire.Fire(main)
