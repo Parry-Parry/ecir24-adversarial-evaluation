@@ -4,8 +4,8 @@ import os
 from tqdm import tqdm
 
 MODELS = {
+    'electra' : 'crystina-z/monoELECTRA_LCE_nneg31',
     't5' : 'castorini/monot5-base-msmarco',
-    'electra' : 'crystina-z/monoELECTRA_LCE_nneg31'
 }
 
 def main(script : str, run_dir : str, output_dir : str):
