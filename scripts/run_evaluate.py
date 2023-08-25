@@ -4,7 +4,7 @@ import os
 from tqdm import tqdm
 
 def main(script : str, run_dir : str, output_dir : str):
-    main_args = ['python', script]
+    main_args = ['python3', script]
     files = [f for f in os.listdir(run_dir) if f.endswith('.tsv') and not f.startswith('normal')]
 
     total = len(files) 
