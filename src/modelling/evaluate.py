@@ -36,7 +36,7 @@ def main(run_file : str, res_dump : str):
     run = os.path.basename(run_file)
     name = run.replace('.tsv', '')
 
-    sub = res[['qid', 'docno', 'rank', 'rank_change', 'success']]
+    sub = res[['qid', 'docno', 'rank', 'rank_change', 'score_change', 'success']]
     sub.to_csv(join(res_dump, f'{name}_rank_changes.tsv'), sep='\t', index=False)
 
 if __name__ == '__main__':
