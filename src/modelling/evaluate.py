@@ -30,6 +30,7 @@ def main(run_file : str, res_dump : str):
     res = pd.read_csv(run_file, sep='\t', index_col=False)
     lookup = build_rank_lookup(res)
     res['rank_change'] = res.apply(lambda row : get_rank_change(row.qid, row.docno, row.augmented_score, lookup), axis=1)
+    res['score_change'] = res['augmented_score'] - res['score']
     res['success'] = res['rank_change'] < 0
 
     run = os.path.basename(run_file)
