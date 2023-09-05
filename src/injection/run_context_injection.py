@@ -66,7 +66,7 @@ def main(doc_file : str,
     token_lookup = queries.set_index('qid')['token'].to_dict() 
     syringe = Syringe(mode=mode, seed=seed)
 
-    docs['token'] = docs['qid'].apply(lambda x : token_lookup[x.qid])
+    docs['token'] = docs['qid'].apply(lambda x : token_lookup[x])
     
     texts = docs['text'].to_list()
     tokens = docs['token'].apply(lambda x : [x for _ in range(n)]).to_list()
