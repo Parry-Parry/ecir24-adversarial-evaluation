@@ -59,7 +59,7 @@ def main(doc_file : str,
     run_file = os.path.basename(doc_file).replace('.tsv', '')
     queries = docs[['qid', 'query']].drop_duplicates()
 
-    query_tokens = map(lambda x : x.split(' '), queries.query.tolist())
+    query_tokens = map(lambda x : x.split(' '), queries['query'].tolist())
     query_tokens = map(lambda x : [tok for tok in x if not stopwords(tok)], query_tokens)
     queries['token'] = [*map(np.random.choice, query_tokens)]
 
