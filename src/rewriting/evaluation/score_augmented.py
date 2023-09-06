@@ -7,7 +7,6 @@ import torch
 import pandas as pd
 import os
 from os.path import join
-import ir_datasets as irds
 
 def init_electra(hparams):
     from pyterrier_dr import ElectraScorer
@@ -41,7 +40,7 @@ def main(run_file : str,
     })
 
     reranker = init_reranker(hparams)
-    res = pd.read_csv(run_file, sep='\t', index_col=False, header=False, names=NAMES)
+    res = pd.read_csv(run_file, sep='\t', index_col=False, header=None, names=NAMES)
     res = reranker.transform(res)
     res['augmented_score'] = res['score']
 
