@@ -14,6 +14,7 @@ def process_prompt(iteration, prompt):
     try:
         pd.read_csv(output_file, names=['qid', 'query', 'docid', 'score', 'rank', 'text'], sep='\t')
         print(f'Skip prompt {prompt} for iteration {iteration}.')
+        return
     except:
         pass
 
