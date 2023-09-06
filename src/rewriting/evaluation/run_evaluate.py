@@ -14,7 +14,7 @@ def main(script : str, run_dir : str, normal_dir : str, output_dir : str):
     for file in files:
         args = main_args.copy()
         args.extend(['--run_file', os.path.join(run_dir, file)])
-        args.extend(['--normal_dir', os.path.join(normal_dir, file)])
+        args.extend(['--normal_dir', normal_dir])
         args.extend(['--res_dump', output_dir])
         sp.run(args)
         progress_bar.update(1)
