@@ -34,7 +34,7 @@ def main(run_file : str, normal_dir : str, res_dump : str):
     res = pd.read_csv(run_file, sep='\t', index_col=False)
     res['rank_change'] = res.apply(lambda row : get_rank_change(row.qid, row.docno, row.augmented_score, t5 if 't5' in name else electra), axis=1)
     res['score_change'] = res['augmented_score'] - res['score']
-    res['success'] = res['rank_change'] < 0
+    res['success'] = res['rank_change'] > 0
 
     run = os.path.basename(run_file)
     name = run.replace('.tsv', '')
