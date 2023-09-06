@@ -3,7 +3,7 @@ import subprocess as sp
 
 
 def main(script : str, token_file : str, doc_file : str, output_dir : str, n : int = None, mode : str = None):
-    N = [1, 2, 3, 4, 5]
+    N = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     modes = ['random', 'start', 'end']
     if n: N = [n]
     if mode: modes = [mode]
