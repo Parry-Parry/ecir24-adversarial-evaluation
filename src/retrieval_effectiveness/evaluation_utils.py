@@ -2,6 +2,22 @@ from copy import deepcopy
 import pandas as pd
 
 
+def report_best_and_worst_case_results(qrels, topics, original_ranking, adversarial_rankings):
+    best_case_run = best_case_runs(qrels, original_ranking, adversarial_rankings)
+    worst_case_run = worst_case_runs(qrels, original_ranking, adversarial_rankings)
+
+    import pyterrier as pt
+    if not pt.started():
+        pt.init()
+
+    return pt.Experiment(
+        [pt.transformer.get_transformer(original_ranking), pt.transformer.get_transformer(best_case_run), pt.transformer.get_transformer(worst_case_run)],
+        qrels=qrels,
+        topics=topics,
+        eval_metrics=["map", "ndcg_cut_10", "P_10"],
+        names=["original", "best_case", "worst_case"],
+    )
+
 def best_case_runs(qrels, original_ranking, adversarial_rankings):
     query_doc_pairs_to_replace = __query_doc_pairs_to_replace(qrels, lambda i: i > 0)
     adversarial_scores = __calculate_adversarial_scores(adversarial_rankings, max)

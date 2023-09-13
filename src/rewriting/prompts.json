@@ -3,5 +3,10 @@
   "2": "Please rewrite this passage increasing the number of the terms relevant and true\n\n<PASSAGE>",
   "3": "Please rewrite this passage adding multiple occurences of the terms relevant and true\n\n<PASSAGE>",
   "4": "Please rewrite this passage adding the terms relevant and/or true at the beginning\n\n<PASSAGE>",
-  "5": "Please rewrite this passage adding the terms relevant and/or true in the first sentence\n\n<PASSAGE>"
+  "5": "Please rewrite this passage adding the terms relevant and/or true in the first sentence\n\n<PASSAGE>",
+  "6": "Please create a single sentence headline for the following passage that uses the terms relevant and/or true\n\n<PASSAGE>",
+  "7": "Please create a single sentence headline for the following passage that includes terms like relevant, true, or similar words\n\n<PASSAGE>",
+  "8": "Please create a TLDR of a single sentence for the following passage that includes the terms relevant and/or true\n\n<PASSAGE>",
+  "9": "Please create a TLDR of a single sentence for the following passage that includes terms like relevant, true, or similar words\n\n<PASSAGE>",
+  "10": "Please summarize the following passage into a single sentence. The sentence must include terms like relevant, true, or similar words.\n\n<PASSAGE>"
 }
