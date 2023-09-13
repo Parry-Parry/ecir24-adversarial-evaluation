@@ -9,12 +9,11 @@ def best_case_runs(qrels, original_ranking, adversarial_rankings):
     return __calculate_run(original_ranking, query_doc_pairs_to_replace, adversarial_scores, 'best_case')
 
 
-def double_best_case_runs(qrels, original_ranking, adversarial_rankings):
-    original_ranking = best_case_runs(qrels, original_ranking, adversarial_rankings)
+def worst_case_runs(qrels, original_ranking, adversarial_rankings):
     query_doc_pairs_to_replace = __query_doc_pairs_to_replace(qrels, lambda i: i <= 0)
-    adversarial_scores = __calculate_adversarial_scores(adversarial_rankings, min)
+    adversarial_scores = __calculate_adversarial_scores(adversarial_rankings, max)
 
-    return __calculate_run(original_ranking, query_doc_pairs_to_replace, adversarial_scores, 'double_best_case')
+    return __calculate_run(original_ranking, query_doc_pairs_to_replace, adversarial_scores, 'worst_case')
 
 
 def __calculate_adversarial_scores(adversarial_rankings, aggregation_function):

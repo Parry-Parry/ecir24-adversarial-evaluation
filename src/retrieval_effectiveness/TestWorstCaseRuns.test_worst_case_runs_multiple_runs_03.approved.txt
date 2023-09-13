@@ -1,0 +1,3 @@
+{"qid":"1","Q0":0,"docno":"doc-3","rank":1,"score":0.92,"system":"worst_case"}
+{"qid":"1","Q0":0,"docno":"doc-1","rank":2,"score":0.9,"system":"worst_case"}
+{"qid":"1","Q0":0,"docno":"doc-2","rank":3,"score":0.8,"system":"worst_case"}
