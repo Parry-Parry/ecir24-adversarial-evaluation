@@ -1,12 +1,20 @@
 import pyterrier as pt
 if not pt.started():
     pt.init()
+import re
 
 from types import SimpleNamespace
 import torch
 import pandas as pd
 import os
 from os.path import join
+
+clean = lambda x : re.sub(r"[^a-zA-Z0-9¿]+", " ", x)
+
+def clean_text(df):
+    df['query'] = df['query'].apply(clean)
+    df['text'] = df['text'].apply(clean)
+    return df
 
 def init_electra(hparams):
     from pyterrier_dr import ElectraScorer
@@ -24,7 +32,8 @@ def init_colbert(hparams):
 def init_bm25(hparams):
     pt_index = pt.get_dataset("msmarco_passage").get_index("terrier_stemmed")
     pt_index = pt.IndexFactory.of(pt_index, memory=True)
-    return pt.text.scorer(body_attr="text", wmodel="BM25", background_index=pt_index)
+    cleaner = pt.apply.generic(lambda x : clean_text(x))
+    return cleaner >> pt.text.scorer(body_attr="text", wmodel="BM25", background_index=pt_index)
 
 def init_tasb(hparams):
     from pyterrier_dr import TasB
@@ -59,6 +68,8 @@ def main(run_file : str,
 
     reranker = init_reranker(hparams)
     res = pd.read_csv(run_file, sep='\t', index_col=False)
+    res['qid'] = res['qid'].astype(str)
+    res['docno'] = res['docno'].astype(str)
     text = res['text_0']
     res = reranker.transform(res)
     res['augmented_score'] = res['score']
