@@ -39,11 +39,12 @@ def main(run_file : str,
 
     reranker = init_reranker(hparams)
     res = pd.read_csv(run_file, sep='\t', index_col=False)
+    text = res['text_0']
     res = reranker.transform(res)
     res['augmented_score'] = res['score']
 
     if not os.path.exists(join(os.path.dirname(output_file), f'normal_{hparams.model}.tsv')):
-        res['text'] = res['text_0']
+        res['text'] = text
         res = reranker.transform(res)
         res.to_csv(join(os.path.dirname(output_file), f'normal_{hparams.model}.tsv'), sep='\t', index=False, header=True)
 
