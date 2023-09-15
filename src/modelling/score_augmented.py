@@ -39,7 +39,12 @@ def main(run_file : str,
 
     reranker = init_reranker(hparams)
     res = pd.read_csv(run_file, sep='\t', index_col=False)
-    text = res['text_0']
+    try:
+        text = res['text_0']
+    except KeyError:
+        print('No text_0 column found, assuming text is in text column')
+        print(run_file)
+        input()
     res = reranker.transform(res)
     res['augmented_score'] = res['score']
 
