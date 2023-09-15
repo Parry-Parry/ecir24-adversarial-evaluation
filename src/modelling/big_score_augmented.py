@@ -18,7 +18,7 @@ def init_t5(hparams):
 
 def init_colbert(hparams):
     from pyterrier_colbert.ranking import ColBERTModelOnlyFactory
-    pytcolbert = ColBERTModelOnlyFactory(hparams.model_name_or_path, gpu=True if hparams.device == 'cuda' else False)
+    pytcolbert = ColBERTModelOnlyFactory(hparams.model_name_or_path, gpu=True)
     return pytcolbert.text_scorer(verbose=True)
 
 def init_bm25(hparams):
