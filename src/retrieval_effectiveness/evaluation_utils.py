@@ -2,7 +2,7 @@ from copy import deepcopy
 import pandas as pd
 
 
-def report_best_and_worst_case_results(qrels, topics, original_ranking, adversarial_rankings):
+def report_best_and_worst_case_results(qrels, topics, original_ranking, adversarial_rankings, model_name):
     best_case_run = best_case_runs(qrels, original_ranking, adversarial_rankings)
     worst_case_run = worst_case_runs(qrels, original_ranking, adversarial_rankings)
 
@@ -14,8 +14,8 @@ def report_best_and_worst_case_results(qrels, topics, original_ranking, adversar
         [pt.transformer.get_transformer(original_ranking), pt.transformer.get_transformer(best_case_run), pt.transformer.get_transformer(worst_case_run)],
         qrels=qrels,
         topics=topics,
-        eval_metrics=["map", "ndcg_cut_10", "P_10"],
-        names=["original", "best_case", "worst_case"],
+        eval_metrics=["map", "ndcg_cut_10", "P_10", "recip_rank"],
+        names=[f"{model_name} (original)", f"{model_name} (best_case)", f"{model_name} (worst_case)"],
     )
 
 def best_case_runs(qrels, original_ranking, adversarial_rankings):

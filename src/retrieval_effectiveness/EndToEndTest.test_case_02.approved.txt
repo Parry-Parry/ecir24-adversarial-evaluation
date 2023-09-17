@@ -1,0 +1,3 @@
+{"name":"t5 (original)","map":0.5,"ndcg_cut_10":0.6309297536,"P_10":0.1,"recip_rank":0.5}
+{"name":"t5 (best_case)","map":1.0,"ndcg_cut_10":1.0,"P_10":0.1,"recip_rank":1.0}
+{"name":"t5 (worst_case)","map":0.3333333333,"ndcg_cut_10":0.5,"P_10":0.1,"recip_rank":0.3333333333}
