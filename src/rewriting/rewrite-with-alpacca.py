@@ -22,14 +22,19 @@ def process_prompt(iteration, prompt):
     ret = []
     for _, i in tqdm(list(df.iterrows())):
         i = i.to_dict()
-        i['text'] = chat_client.chat(prompt_str.replace('<PASSAGE>', i['text']))
+        text = chat_client.chat(prompt_str.replace('<PASSAGE>', i['text']))
+
+        if prompt > 5:
+            text = text + ' ' + i['text']
+
+        i['text'] = text
         ret += [i]
 
     ret = pd.DataFrame(ret)
     ret.to_csv(output_file, sep='\t', header=False, index=False)
 
 
-for iteration in ['1', '2', '3', '4', '5']:
-    for prompt in ['1', '2', '3', '4', '5']:
+for iteration in ['1']:
+    for prompt in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']:
         process_prompt(iteration, prompt)
 
