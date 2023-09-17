@@ -17,7 +17,7 @@ def tsv_runs_to_trec_runs(model):
     runs = glob(f'data/runs/*{model}.tsv.gz')
 
     # format baseline
-    persist_run(read_run(runs[0]), model, 'data/trec-runs/baseline.trec', 'score')
+    persist_run(read_run(runs[0]), model, f'data/trec-runs/baseline_{model}.trec', 'score')
 
     for i in tqdm(runs):
         run_name = i.split('/')[-1].split(f'.tsv.gz')[0]
