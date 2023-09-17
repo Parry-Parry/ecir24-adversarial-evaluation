@@ -24,7 +24,7 @@ def process_prompt(iteration, prompt):
         i = i.to_dict()
         text = chat_client.chat(prompt_str.replace('<PASSAGE>', i['text']))
 
-        if prompt > 5:
+        if int(prompt) > 5:
             text = text + ' ' + i['text']
 
         i['text'] = text
