@@ -90,7 +90,7 @@ def __normalize_run(run, system_name, depth=1000):
 def run_best_and_worst_case_evaluation(model, dataset):
     original_ranking = read_run(f'data/trec-runs/baseline_{model}.trec')
     adversarial_rankings = []
-    for i in tqdm(glob(f'data/trec-runs/*{model}.trec')[:3], 'Load Runs'):
+    for i in tqdm(glob(f'data/trec-runs/*{model}.trec'), 'Load Runs'):
         if 'baseline' in i:
             continue
         adversarial_rankings += [read_run(i)]
