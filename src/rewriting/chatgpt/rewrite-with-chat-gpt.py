@@ -9,7 +9,8 @@ request_prompt = "2"
 target_file = f'text-rewrites-from-chatgpt-raw-prompt-{request_prompt}.json'
 prompts = json.load(open('../prompts.json'))
 #queries = pd.read_csv('../../../data/llm-rewrite/bm25_19_sample_1000.tsv.gz', names=['qid', 'query', 'docid', 'score', 'rank', 'text'], sep='\t')
-queries = pd.read_csv('../../../data/bm25_19.tsv.gz', names=['qid', 'query', 'docid', 'score', 'rank', 'text'], sep='\t', header=0)
+#queries = pd.read_csv('../../../data/bm25_19.tsv.gz', names=['qid', 'query', 'docid', 'score', 'rank', 'text'], sep='\t', header=0)
+queries = pd.read_csv('../../../data/bm25_20.tsv.gz', names=['qid', 'query', 'docid', 'score', 'rank', 'text'], sep='\t', header=0)
 queries = queries[queries['rank'].astype(int) <= 100]
 queries = list(queries['text'])
 
