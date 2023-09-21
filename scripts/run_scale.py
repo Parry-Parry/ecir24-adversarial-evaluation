@@ -9,6 +9,12 @@ MODELS = {
     't5.3b' : 'castorini/monot5-3b-msmarco',
 }
 
+BATCH_SIZES = {
+    't5.small' : 128,
+    't5.large' : 128,
+    't5.3b' : 64,
+}
+
 def main(script : str, run_dir : str, output_dir : str, batch_size : int = 128):
     main_args = ['python', script]
     files = [f for f in os.listdir(run_dir) if f.endswith('.tsv')]
@@ -29,7 +35,7 @@ def main(script : str, run_dir : str, output_dir : str, batch_size : int = 128):
             args.extend(['--output_file', output_file])
             args.extend(['--model', name])
             args.extend(['--model_name_or_path', ckpt])
-            args.extend(['--batch_size', str(batch_size)])
+            args.extend(['--batch_size', str(BATCH_SIZES[name])])
             sp.run(args)
             progress_bar.update(1)
 

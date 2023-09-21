@@ -72,8 +72,9 @@ def main(run_file : str, out_file : str):
     header = r'\toprule'
     columns = 'Token & ' + ' & '.join([r'\multicolumn{' + str(len(DATA_DICT)) + r'}{c}{' + f'{model}' + r'}' for _, model in MODEL_DICT.items()]) + r'\\'    
     # for each model column write each dataset from data_dict twice 
-    datasets = '& & & ' + ' & '.join([' & '.join(r'\multicolumn{3}{c}{' + f'{data}' + r'}' for _, data in DATA_DICT.items())] * len(MODEL_DICT)) + r'\\'
-    total = [preamble, header, columns, r'\midrule', datasets, r'\midrule']
+    datasets = '& ' + ' & '.join([' & '.join(r'\multicolumn{3}{c}{' + f'{data}' + r'}' for _, data in DATA_DICT.items())] * len(MODEL_DICT)) + r'\\'
+    metrics = '& ' + ' & '.join([' & '.join(['P', 'R', 'MRC (SR)'] * len(DATA_DICT))] * len(MODEL_DICT)) + r'\\'
+    total = [preamble, header, columns, r'\midrule', datasets, r'\midrule', metrics, r'\midrule']
     for group, tokens in TOKEN_GROUPS.items():
         total.append(r'\midrule')
         total.append(r'\multicolumn{7}{l}{' + group + r'}\\')
@@ -82,15 +83,14 @@ def main(run_file : str, out_file : str):
             row = ''
             token_subset = df[df.token==token].copy()
             row += token + ' & ' + token_subset['position'].unique()[0] + ' & ' + str(token_subset['n_tok'].unique()[0]) + ' & '
-
             for val, _ in MODEL_DICT.items():
                 model_subset = token_subset[token_subset.model==val].copy()
-
                 for data, _ in DATA_DICT.items():
                     data_subset = model_subset[model_subset.dataset==data].copy()
                     mrc = data_subset[data_subset.metric=='MRC'].value.values[0]
                     sr = data_subset[data_subset.metric=='Success Rate'].value.values[0]
-
+                    row += data_subset.position.values[0] + ' & '
+                    row += data_subset.n_tok.values[0] + ' & '
                     row += colour_combo(mrc, sr) + ' & '
 
                     '''
