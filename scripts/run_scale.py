@@ -5,7 +5,6 @@ from tqdm import tqdm
 
 MODELS = {
     't5.small' : 'castorini/monot5-small-msmarco-100k',
-    't5.base' : 'castorini/monot5-base-msmarco',
     't5.large' : 'castorini/monot5-large-msmarco',
     't5.3b' : 'castorini/monot5-3b-msmarco',
 }
