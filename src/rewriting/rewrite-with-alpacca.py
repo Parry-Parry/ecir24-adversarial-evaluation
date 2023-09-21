@@ -38,7 +38,7 @@ def process_prompt(iteration, prompt, filename):
 for iteration in ['1']:
     #in the pilot study, we selected prompt 10 and 3 as the most effective ones:
     for prompt in ['3', '10']:
-        for filename in ['bm25_20-xaa', 'bm25_20-xab', 'bm25_20_xac', 'bm25_20_xad', 'bm25_20_xae', 'bm25_20_xae']:
+        for filename in ['bm25_20-xaa', 'bm25_20-xab', 'bm25_20-xac', 'bm25_20-xad', 'bm25_20-xae', 'bm25_20-xae']:
 
     #for the pilot study
     #for prompt in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']:
