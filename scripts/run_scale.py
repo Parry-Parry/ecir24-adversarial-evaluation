@@ -12,7 +12,7 @@ MODELS = {
 BATCH_SIZES = {
     't5.small' : 128,
     't5.large' : 128,
-    't5.3b' : 64,
+    't5.3b' : 32,
 }
 
 def main(script : str, run_dir : str, output_dir : str, batch_size : int = 128):
