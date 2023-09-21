@@ -28,7 +28,7 @@ def main(run_file : str,
          output_file : str,
          model : str = 't5',
          model_name_or_path : str = 'castorini/monot5-base-msmarco',
-         batch_size : int = 32):
+         batch_size : int = 128):
     
     hparams = SimpleNamespace(**{
         'model' : model,
