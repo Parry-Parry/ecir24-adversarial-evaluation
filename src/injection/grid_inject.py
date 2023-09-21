@@ -1,8 +1,8 @@
 from fire import Fire
 import subprocess as sp
 
-def main(script : str, token_file : str, doc_file : str, output_dir : str, n : int = None, mode : str = None):
-    N = [1, 2, 3, 4, 5]
+def main(script : str, token_file : str, doc_file : str, output_dir : str, n : int = None, mode : str = None, range : int = 5):
+    N = [i for i in range(1, range + 1)]
     modes = ['random', 'start', 'end']
     if n: N = [n]
     if mode: modes = [mode]
