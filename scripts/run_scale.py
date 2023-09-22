@@ -9,13 +9,12 @@ MODELS = {
     't5.3b' : 'castorini/monot5-3b-msmarco',
 }
 
-BATCH_SIZES = {
+def main(script : str, run_dir : str, output_dir : str, batch_size : int = 16):
+    BATCH_SIZES = {
     't5.small' : 128,
     't5.large' : 128,
-    't5.3b' : 32,
-}
-
-def main(script : str, run_dir : str, output_dir : str, batch_size : int = 128):
+    't5.3b' : batch_size,
+    }
     main_args = ['python', script]
     files = [f for f in os.listdir(run_dir) if f.endswith('.tsv')]
 

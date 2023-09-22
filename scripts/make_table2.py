@@ -15,6 +15,12 @@ TOKEN_GROUPS = {
     'Misspellings' : ['relevanty', 'relevent', 'trues', 'falses']
 }
 
+POSITIONS = {
+    'start' : 's',
+    'end' : 'e',
+    'random' : 'r'
+}
+
 def format_colour(value, colour_level, percent=False):
     if percent:
         if value >= 0.5:
@@ -68,29 +74,31 @@ def main(run_file : str, out_file : str):
         norm_val = min(norm_val, 50)
         return format_mrc(round(mrc, 1), round(sr * 100, 1), norm_val)
     
-    preamble = r'\begin{tabular}{@{}lllrrrrrrrrrr@{}}'
+    preamble = r'\begin{tabular}{@{}lrrrrrrrrrrrr@{}}'
     header = r'\toprule'
-    columns = 'Token & ' + ' & '.join([r'\multicolumn{' + str(len(DATA_DICT)) + r'}{c}{' + f'{model}' + r'}' for _, model in MODEL_DICT.items()]) + r'\\'    
+    columns = 'Token & ' + ' & '.join([r'\multicolumn{' + str(len(DATA_DICT)*3) + r'}{c}{' + f'{model}' + r'}' for _, model in MODEL_DICT.items()]) + r'\\'    
     # for each model column write each dataset from data_dict twice 
     datasets = '& ' + ' & '.join([' & '.join(r'\multicolumn{3}{c}{' + f'{data}' + r'}' for _, data in DATA_DICT.items())] * len(MODEL_DICT)) + r'\\'
     metrics = '& ' + ' & '.join([' & '.join(['P', 'R', 'MRC (SR)'] * len(DATA_DICT))] * len(MODEL_DICT)) + r'\\'
     total = [preamble, header, columns, r'\midrule', datasets, r'\midrule', metrics, r'\midrule']
     for group, tokens in TOKEN_GROUPS.items():
         total.append(r'\midrule')
-        total.append(r'\multicolumn{7}{l}{' + group + r'}\\')
+        total.append(r'\multicolumn{13}{l}{' + group + r'}\\')
         total.append(r'\midrule')
         for token in tokens:
             row = ''
             token_subset = df[df.token==token].copy()
-            row += token + ' & ' + token_subset['position'].unique()[0] + ' & ' + str(token_subset['n_tok'].unique()[0]) + ' & '
+            row += token + ' & '
             for val, _ in MODEL_DICT.items():
                 model_subset = token_subset[token_subset.model==val].copy()
+                print(model_subset)
+                assert len(model_subset) == len(DATA_DICT) * 2
                 for data, _ in DATA_DICT.items():
                     data_subset = model_subset[model_subset.dataset==data].copy()
                     mrc = data_subset[data_subset.metric=='MRC'].value.values[0]
                     sr = data_subset[data_subset.metric=='Success Rate'].value.values[0]
-                    row += data_subset.position.values[0] + ' & '
-                    row += data_subset.n_tok.values[0] + ' & '
+                    row += POSITIONS[data_subset.position.values[0]] + ' & '
+                    row += str(data_subset.n_tok.values[0]) + ' & '
                     row += colour_combo(mrc, sr) + ' & '
 
                     '''
