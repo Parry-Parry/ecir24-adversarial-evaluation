@@ -72,7 +72,7 @@ def main(run_dir : str,
     for run_file in run_files: 
         output_file = f'{run_file.replace(".tsv", "")}_{model}.tsv'
 
-        res = pd.read_csv(run_file, sep='\t', index_col=False)
+        res = pd.read_csv(join(run_dir, run_file), sep='\t', index_col=False)
         res['qid'] = res['qid'].astype(str)
         res['docno'] = res['docno'].astype(str)
         text = res['text_0']
