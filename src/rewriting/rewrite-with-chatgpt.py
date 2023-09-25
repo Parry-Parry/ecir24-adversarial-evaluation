@@ -6,7 +6,9 @@ import json
 def process_prompt(iteration, prompt):
     prompts = json.load(open(f'chatgpt/text-rewrites-from-chatgpt-raw-prompt-{prompt}.json', 'r'))
 
-    df = pd.read_csv('../../data/llm-rewrite/bm25_19_sample_1000.tsv.gz', names=['qid', 'query', 'docid', 'score', 'rank', 'text'], sep='\t')
+    df = pd.read_csv('../../data/bm25_20.tsv.gz', names=['qid', 'query', 'docid', 'score', 'rank', 'text'], header=1, sep='\t')
+    df = df[df['rank'].astype(int) <= 100]
+
     ret = []
     for _, i in tqdm(list(df.iterrows())):
         i = i.to_dict()
@@ -14,12 +16,14 @@ def process_prompt(iteration, prompt):
         ret += [i]
 
     ret = pd.DataFrame(ret)
-    ret.to_csv(f'../../data/llm-rewrite/bm25_19_sample_1000_chatgpt_prompt_{prompt}_iter_{iteration}.tsv.gz', sep='\t', header=False, index=False)
+    ret.to_csv(f'../../data/llm-rewrite/bm25_20_top_100_chatgpt_prompt_{prompt}_iter_{iteration}.tsv.gz', sep='\t', header=False, index=False)
 
 def process_prompt_prepend_text(iteration, prompt):
     prompts = json.load(open(f'chatgpt/text-rewrites-from-chatgpt-raw-prompt-{prompt}.json', 'r'))
 
-    df = pd.read_csv('../../data/llm-rewrite/bm25_19_sample_1000.tsv.gz', names=['qid', 'query', 'docid', 'score', 'rank', 'text'], sep='\t')
+    df = pd.read_csv('../../data/bm25_19.tsv.gz', names=['qid', 'query', 'docid', 'score', 'rank', 'text'], header=1, sep='\t')
+    df = df[df['rank'].astype(int) <= 100]
+
     ret = []
     for _, i in tqdm(list(df.iterrows())):
         i = i.to_dict()
@@ -27,13 +31,13 @@ def process_prompt_prepend_text(iteration, prompt):
         ret += [i]
 
     ret = pd.DataFrame(ret)
-    ret.to_csv(f'../../data/llm-rewrite/bm25_19_sample_1000_chatgpt_prompt_{prompt}_iter_{iteration}.tsv.gz', sep='\t', header=False, index=False)
+    ret.to_csv(f'../../data/llm-rewrite/bm25_20_top_100_chatgpt_prompt_{prompt}_iter_{iteration}.tsv.gz', sep='\t', header=False, index=False)
 
 
 for iteration in ['1']:
-    for prompt in ['1', '2', '3', '4', '5']:
+    for prompt in ['2']:
         process_prompt(iteration, prompt)
 
 for iteration in ['1']:
-    for prompt in ['6', '7', '8', '9', '10']:
+    for prompt in ['8']:
         process_prompt_prepend_text(iteration, prompt)
