@@ -9,6 +9,8 @@ import pandas as pd
 import os
 from os.path import join
 
+from tqdm import tqdm
+
 clean = lambda x : re.sub(r"[^a-zA-Z0-9¿]+", " ", x)
 
 def clean_text(df):
@@ -69,7 +71,7 @@ def main(run_dir : str,
 
     reranker = init_reranker(hparams)
     run_files = [f for f in os.listdir(run_dir) if f.endswith('.tsv')]
-    for run_file in run_files: 
+    for run_file in tqdm(run_files): 
         output_file = f'{run_file.replace(".tsv", "")}_{model}.tsv'
 
         res = pd.read_csv(join(run_dir, run_file), sep='\t', index_col=False)
