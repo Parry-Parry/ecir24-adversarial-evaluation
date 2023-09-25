@@ -4,8 +4,8 @@ from fire import Fire
 METRICS = ['MRC', 'Success Rate']
 #MODEL_DICT = {'bm25' : 'BM25', 'colbert' : 'ColBERT', 'tasb' : 'TAS-B', 't5' : 'MonoT5', 'electra' : 'MonoElectra'}
 MODEL_DICT = {'bm25' : 'BM25', 't5' : 'MonoT5', 'tasb' : 'TAS-B', 'electra' : 'MonoElectra'}
-#DATA_DICT = {'dl19' : 'DL19', 'dl20' : 'DL20'}
-DATA_DICT = {'dl19' : 'DL19'}
+DATA_DICT = {'dl19' : 'DL19', 'dl20' : 'DL20'}
+#DATA_DICT = {'dl19' : 'DL19'}
 
 TOKEN_GROUPS = {
     'Prompt Tokens' : ['true', 'false', 'relevant', 'relevanttrue', 'relevantfalse'],

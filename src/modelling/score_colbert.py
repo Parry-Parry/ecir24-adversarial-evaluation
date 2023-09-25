@@ -58,7 +58,7 @@ def main(run_dir : str,
          batch_size : int = 32):
     
     model = 'colbert'
-    model_name_or_path = 'http://www.dcs.gla.ac.uk/~craigm/ecir2021-tutorial/colbert_model_checkpoint.zip',
+    model_name_or_path = 'http://www.dcs.gla.ac.uk/~craigm/ecir2021-tutorial/colbert_model_checkpoint.zip'
     
     hparams = SimpleNamespace(**{
         'model' : model,
