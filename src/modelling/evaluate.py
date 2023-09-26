@@ -21,6 +21,21 @@ def get_rank_change(qid, docno, score, lookup):
     rank_change = old_rank[0] - [i for i, item in enumerate(new_ranks) if item[0]==docno][0]
     return rank_change
 
+def get_old_rank(qid, docno, lookup):
+    old_ranks = [(k, v) for k, v in lookup[qid]]
+    old_ranks.sort(key=lambda x : x[1], reverse=True)
+    old_rank = [i for i, item in enumerate(old_ranks) if item[0]==docno]
+    return old_rank[0]
+
+def get_new_rank(qid, docno, score, lookup):
+    old_ranks = [(k, v) for k, v in lookup[qid]]
+    old_ranks.sort(key=lambda x : x[1], reverse=True)
+    new_ranks = [item for item in old_ranks if item[0] != docno]
+    new_ranks.append((docno, score))
+    new_ranks.sort(reverse=True, key=lambda x : x[1])
+    new_rank = [i for i, item in enumerate(new_ranks) if item[0]==docno]
+    return new_rank[0]
+
 def main(run_file : str, res_dump : str):
     run = os.path.basename(run_file)
     name = run.replace('.tsv', '')
@@ -29,7 +44,13 @@ def main(run_file : str, res_dump : str):
         return
     res = pd.read_csv(run_file, sep='\t', index_col=False)
     lookup = build_rank_lookup(res)
-    res['rank_change'] = res.apply(lambda row : get_rank_change(row.qid, row.docno, row.augmented_score, lookup), axis=1)
+
+    def add_rank_change(df):
+        df['rank_change'] = df.apply(lambda row : get_rank_change(row.qid, row.docno, row.augmented_score, lookup), axis=1)
+        df['old_rank'] = df.apply(lambda row : get_old_rank(row.qid, row.docno, lookup), axis=1)
+        df['new_rank'] = df.apply(lambda row : get_new_rank(row.qid, row.docno, row.augmented_score, lookup), axis=1)
+
+    res = add_rank_change(res)
     res['score_change'] = res['augmented_score'] - res['score']
     res['success'] = res['rank_change'] > 0
 

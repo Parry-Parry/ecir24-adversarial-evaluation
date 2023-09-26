@@ -14,9 +14,14 @@ def build_lookup(df, score_col='score', rank_col='rank'):
 def main(run_dir : str, normal_dir : str, out_dir : str):
     electra = build_lookup(pd.read_csv(join(normal_dir, 'normal_electra.tsv'), sep='\t', index_col=False))
     t5 = build_lookup(pd.read_csv(join(normal_dir, 'normal_t5.tsv'), sep='\t', index_col=False))
-    tasb = build_lookup(pd.read_csv(join(normal_dir, 'normal_tasb.tsv'), sep='\t', index_col=False))
-    colbert = build_lookup(pd.read_csv(join(normal_dir, 'normal_colbert.tsv'), sep='\t', index_col=False))
-    bm25 = build_lookup(pd.read_csv(join(normal_dir, 'normal_bm25.tsv'), sep='\t', index_col=False))
+    try:
+        tasb = build_lookup(pd.read_csv(join(normal_dir, 'normal_tasb.tsv'), sep='\t', index_col=False))
+        colbert = build_lookup(pd.read_csv(join(normal_dir, 'normal_colbert.tsv'), sep='\t', index_col=False))
+        bm25 = build_lookup(pd.read_csv(join(normal_dir, 'normal_bm25.tsv'), sep='\t', index_col=False))
+    except FileNotFoundError:
+        tasb = {}
+        colbert = {}
+        bm25 = {}
 
     files = [f for f in os.listdir(run_dir) if f.endswith('.tsv') and not f.startswith('normal')]
 
