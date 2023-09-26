@@ -3,7 +3,7 @@ from fire import Fire
 
 METRICS = ['MRC', 'Success Rate']
 #MODEL_DICT = {'bm25' : 'BM25', 'colbert' : 'ColBERT', 'tasb' : 'TAS-B', 't5' : 'MonoT5', 'electra' : 'MonoElectra'}
-MODEL_DICT = {'t5.small' : r'MonoT5$_\text{small}$', 't5.base' : r'MonoT5$_\text{base}$', 't5.large' : r'MonoT5$_\text{large}$', 't5.3B' : r'MonoT5$_\text{3B}$'}
+MODEL_DICT = {'t5.small' : r'MonoT5$_\text{small}$', 't5.base' : r'MonoT5$_\text{base}$', 't5.large' : r'MonoT5$_\text{large}$', 't5.3b' : r'MonoT5$_\text{3B}$'}
 DATA_DICT = {'dl19' : 'DL19', 'dl20' : 'DL20'}
 #DATA_DICT = {'dl19' : 'DL19'}
 
@@ -32,16 +32,18 @@ def format_colour(value, colour_level, percent=False):
     elif value==0.: return r'\cellcolor{pos!0}' + f'$+{abs(value)}$'
     else: return r'\cellcolor{' + 'pos' + f'!{colour_level}' + '}' f'$+{abs(value)}$'
 
-def format_mrc(mrc, sr, colour_level):
-    if mrc < 0.: return r'\cellcolor{' + 'neg' + f'!{colour_level}' + '}' + f'$-{abs(mrc)} ({abs(sr)}\%)$'
-    elif mrc==0.: return r'\cellcolor{pos!0}' + f'$+{abs(mrc)} ({abs(sr)}\%)$'
-    else: return r'\cellcolor{' + 'pos' + f'!{colour_level}' + '}' f'$+{abs(mrc)} ({abs(sr)}\%)$'
+def format_mrc(mrc, sr, colour_level, sig):
+    if mrc < 0.: out = r'\cellcolor{' + 'neg' + f'!{colour_level}' + '}' + f'$-{abs(mrc)} ({abs(sr)}\%)$'
+    elif mrc==0.: out = r'\cellcolor{pos!0}' + f'$+{abs(mrc)} ({abs(sr)}\%)$'
+    else: out = r'\cellcolor{' + 'pos' + f'!{colour_level}' + '}' f'$+{abs(mrc)} ({abs(sr)}\%)$'
+    if sig: out += r'\sig'
+    else: out += r'\insig'
+    return out
 
 def main(run_file : str, out_file : str):
     df = pd.read_csv(run_file, sep='\t', index_col=False)
     # for each metric find the absolute maximum value 
     tmp = df[df.model != 'bm25'].copy()
-    tmp = tmp[tmp.model != 'colbert'].copy()
     max_vals = {
         #'MSC' : max(df[df.metric=='MSC'].value.max(), abs(df[df.metric=='MSC'].value.min())),
         'MRC' : tmp[tmp.metric=='MRC'].value.max(),
@@ -49,30 +51,15 @@ def main(run_file : str, out_file : str):
     }
 
     print(max_vals)
-
-    def colour_metric(value, metric):
-        max_val = max_vals[metric]
-        abs_val = abs(value)
-        # min max normalise abs_val between max val and 0 
-        norm_val = (abs_val - 0) / (max_val - 0)
-        if metric=='Success Rate':
-            if norm_val > 0.5:
-                norm_val = round(norm_val * 50)
-            else:
-                norm_val = round((1 - norm_val) * 50)
-        else:
-            norm_val = round(norm_val * 50)
-        norm_val = min(norm_val, 50)
-        return format_colour(round(value, 1) if metric != 'Success Rate' else round(value * 100, 1), norm_val, percent=metric=='Success Rate')
     
-    def colour_combo(mrc, sr):
+    def colour_combo(mrc, sr, sig=False):
         max_val = max_vals['MRC']
         abs_val = abs(mrc)
         # min max normalise abs_val between max val and 0 
         norm_val = (abs_val - 0) / (max_val - 0)
         norm_val = round(norm_val * 50)
         norm_val = min(norm_val, 50)
-        return format_mrc(round(mrc, 1), round(sr * 100, 1), norm_val)
+        return format_mrc(round(mrc, 1), round(sr * 100, 1), norm_val, sig)
     
     preamble = r'\begin{tabular}{@{}lrrrrrrrrrrrr@{}}'
     header = r'\toprule'

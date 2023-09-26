@@ -36,8 +36,6 @@ def get_new_rank(qid, docno, score, lookup):
     new_rank = [i for i, item in enumerate(new_ranks) if item[0]==docno]
     return new_rank[0]
 
-
-
 def main(run_file : str, normal_dir : str, res_dump : str):
 
     electra = build_rank_lookup(pd.read_csv(join(normal_dir, 'normal_electra.tsv'), sep='\t', index_col=False))
