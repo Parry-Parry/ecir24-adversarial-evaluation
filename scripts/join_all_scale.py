@@ -15,7 +15,7 @@ def main(run_dir : str, out_dir : str):
     small = build_lookup(pd.read_csv(join(run_dir, 'normal_t5.small.tsv'), sep='\t', index_col=False))
     base = build_lookup(pd.read_csv(join(run_dir, 'normal_t5.base.tsv'), sep='\t', index_col=False))
     large = build_lookup(pd.read_csv(join(run_dir, 'normal_t5.large.tsv'), sep='\t', index_col=False))
-    _3B = build_lookup(pd.read_csv(join(run_dir, 'normal_t5.3B.tsv'), sep='\t', index_col=False))
+    _3B = build_lookup(pd.read_csv(join(run_dir, 'normal_t5.3b.tsv'), sep='\t', index_col=False))
 
     files = [f for f in os.listdir(run_dir) if f.endswith('.tsv') and not f.startswith('normal')]
 
