@@ -26,24 +26,31 @@ def main(run_dir : str, normal_dir : str, out_dir : str, old : bool = False):
     files = [f for f in os.listdir(run_dir) if f.endswith('.tsv') and not f.startswith('normal')]
 
     for file in files:
+        if join(out_dir, file) in os.listdir(out_dir):
+            print('Already exists:', file)
+            continue
         df = pd.read_csv(join(run_dir, file), sep='\t', index_col=False)
         df['qid'] = df['qid'].astype(str)
         df['docno'] = df['docno'].astype(str)
-        if 't5' in file:
-            df['rank'] = df.apply(lambda x : t5[x.qid][x.docno][0], axis=1)
-            df['score'] = df.apply(lambda x : t5[x.qid][x.docno][1], axis=1)
-        elif 'electra' in file:
-            df['rank'] = df.apply(lambda x : electra[x.qid][x.docno][0], axis=1)
-            df['score'] = df.apply(lambda x : electra[x.qid][x.docno][1], axis=1)
-        elif 'tasb' in file:
-            df['rank'] = df.apply(lambda x : tasb[x.qid][x.docno][0], axis=1)
-            df['score'] = df.apply(lambda x : tasb[x.qid][x.docno][1], axis=1)
-        elif 'colbert' in file:
-            df['rank'] = df.apply(lambda x : colbert[x.qid][x.docno][0], axis=1)
-            df['score'] = df.apply(lambda x : colbert[x.qid][x.docno][1], axis=1)
-        else:
-            df['rank'] = df.apply(lambda x : bm25[x.qid][x.docno][0], axis=1)
-            df['score'] = df.apply(lambda x : bm25[x.qid][x.docno][1], axis=1)
+        try:
+            if 't5' in file:
+                df['rank'] = df.apply(lambda x : t5[x.qid][x.docno][0], axis=1)
+                df['score'] = df.apply(lambda x : t5[x.qid][x.docno][1], axis=1)
+            elif 'electra' in file:
+                df['rank'] = df.apply(lambda x : electra[x.qid][x.docno][0], axis=1)
+                df['score'] = df.apply(lambda x : electra[x.qid][x.docno][1], axis=1)
+            elif 'tasb' in file:
+                df['rank'] = df.apply(lambda x : tasb[x.qid][x.docno][0], axis=1)
+                df['score'] = df.apply(lambda x : tasb[x.qid][x.docno][1], axis=1)
+            elif 'colbert' in file:
+                df['rank'] = df.apply(lambda x : colbert[x.qid][x.docno][0], axis=1)
+                df['score'] = df.apply(lambda x : colbert[x.qid][x.docno][1], axis=1)
+            else:
+                df['rank'] = df.apply(lambda x : bm25[x.qid][x.docno][0], axis=1)
+                df['score'] = df.apply(lambda x : bm25[x.qid][x.docno][1], axis=1)
+        except KeyError:
+            print(file)
+            continue
         df.to_csv(join(out_dir, file), sep='\t', index=False, header=True)
 
 if __name__ == '__main__':
