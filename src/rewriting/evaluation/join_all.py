@@ -27,6 +27,8 @@ def main(run_dir : str, normal_dir : str, out_dir : str, old : bool = False):
 
     for file in files:
         df = pd.read_csv(join(run_dir, file), sep='\t', index_col=False)
+        df['qid'] = df['qid'].astype(str)
+        df['docno'] = df['docno'].astype(str)
         if 't5' in file:
             df['rank'] = df.apply(lambda x : t5[x.qid][x.docno][0], axis=1)
             df['score'] = df.apply(lambda x : t5[x.qid][x.docno][1], axis=1)
