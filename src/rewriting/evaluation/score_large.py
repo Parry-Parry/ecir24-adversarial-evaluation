@@ -73,6 +73,7 @@ def main(run_file : str,
     res = pd.read_csv(run_file, sep='\t', index_col=False, header=None, names=NAMES)
     res['qid'] = res['qid'].astype(str)
     res['docno'] = res['docno'].astype(str)
+    res['text'] = res['text'].astype(str)
     res = reranker.transform(res)
     res['augmented_score'] = res['score']
 
