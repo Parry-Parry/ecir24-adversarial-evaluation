@@ -13,7 +13,7 @@ MODELS = {
 
 def main(script : str, run_dir : str, output_dir : str, batch_size : int = 128):
     main_args = ['python', script]
-    files = [f for f in os.listdir(run_dir) if f.endswith('.tsv')]
+    files = [f for f in os.listdir(run_dir) if f.endswith('.tsv') or f.endswith('.gz')]
 
     total = len(files) * len(MODELS)
 
