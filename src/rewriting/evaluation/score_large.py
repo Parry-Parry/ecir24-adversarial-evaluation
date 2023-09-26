@@ -73,14 +73,8 @@ def main(run_file : str,
     res = pd.read_csv(run_file, sep='\t', index_col=False, header=None, names=NAMES)
     res['qid'] = res['qid'].astype(str)
     res['docno'] = res['docno'].astype(str)
-    text = res['text_0']
     res = reranker.transform(res)
     res['augmented_score'] = res['score']
-
-    if not os.path.exists(join(os.path.dirname(output_file), f'normal_{hparams.model}.tsv')):
-        res['text'] = text
-        res = reranker.transform(res)
-        res.to_csv(join(os.path.dirname(output_file), f'normal_{hparams.model}.tsv'), sep='\t', index=False, header=True)
 
     res.to_csv(output_file, sep='\t', index=False, header=True)
 
