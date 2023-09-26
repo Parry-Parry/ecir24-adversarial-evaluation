@@ -49,7 +49,7 @@ def main(run_dir : str, normal_dir : str, out_dir : str, old : bool = False):
                 df['rank'] = df.apply(lambda x : bm25[x.qid][x.docno][0], axis=1)
                 df['score'] = df.apply(lambda x : bm25[x.qid][x.docno][1], axis=1)
         except KeyError:
-            print(file)
+            print('error', file)
             continue
         df.to_csv(join(out_dir, file), sep='\t', index=False, header=True)
 
