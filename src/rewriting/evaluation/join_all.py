@@ -14,6 +14,9 @@ def build_lookup(df, score_col='score', rank_col='rank'):
 def main(run_dir : str, normal_dir : str, out_dir : str):
     electra = build_lookup(pd.read_csv(join(normal_dir, 'normal_electra.tsv'), sep='\t', index_col=False))
     t5 = build_lookup(pd.read_csv(join(normal_dir, 'normal_t5.tsv'), sep='\t', index_col=False))
+    tasb = build_lookup(pd.read_csv(join(normal_dir, 'normal_tasb.tsv'), sep='\t', index_col=False))
+    colbert = build_lookup(pd.read_csv(join(normal_dir, 'normal_colbert.tsv'), sep='\t', index_col=False))
+    bm25 = build_lookup(pd.read_csv(join(normal_dir, 'normal_bm25.tsv'), sep='\t', index_col=False))
 
     files = [f for f in os.listdir(run_dir) if f.endswith('.tsv') and not f.startswith('normal')]
 
@@ -22,9 +25,18 @@ def main(run_dir : str, normal_dir : str, out_dir : str):
         if 't5' in file:
             df['rank'] = df.apply(lambda x : t5[x.qid][x.docno][0], axis=1)
             df['score'] = df.apply(lambda x : t5[x.qid][x.docno][1], axis=1)
-        else:
+        elif 'electra' in file:
             df['rank'] = df.apply(lambda x : electra[x.qid][x.docno][0], axis=1)
             df['score'] = df.apply(lambda x : electra[x.qid][x.docno][1], axis=1)
+        elif 'tasb' in file:
+            df['rank'] = df.apply(lambda x : tasb[x.qid][x.docno][0], axis=1)
+            df['score'] = df.apply(lambda x : tasb[x.qid][x.docno][1], axis=1)
+        elif 'colbert' in file:
+            df['rank'] = df.apply(lambda x : colbert[x.qid][x.docno][0], axis=1)
+            df['score'] = df.apply(lambda x : colbert[x.qid][x.docno][1], axis=1)
+        else:
+            df['rank'] = df.apply(lambda x : bm25[x.qid][x.docno][0], axis=1)
+            df['score'] = df.apply(lambda x : bm25[x.qid][x.docno][1], axis=1)
         df.to_csv(join(out_dir, file), sep='\t', index=False, header=True)
 
 if __name__ == '__main__':
