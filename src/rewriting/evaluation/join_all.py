@@ -8,7 +8,7 @@ def build_lookup(df, score_col='score', rank_col='rank'):
     for qid in df.qid.unique().tolist():
         sub = df[df.qid==qid].copy()
         assert len(sub) > 0
-        frame[qid] = {row.docno : (getattr(row, rank_col), getattr(row, score_col)) for row in sub.itertuples()}
+        frame[str(qid)] = {str(row.docno) : (getattr(row, rank_col), getattr(row, score_col)) for row in sub.itertuples()}
     return frame
 
 def main(run_dir : str, normal_dir : str, out_dir : str, old : bool = False):
