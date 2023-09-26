@@ -30,7 +30,7 @@ def main(run_dir : str, out_dir : str):
         elif 'large' in file:
             df['rank'] = df.apply(lambda x : large[x.qid][x.docno][0], axis=1)
             df['score'] = df.apply(lambda x : large[x.qid][x.docno][1], axis=1)
-        elif '3B' in file:
+        elif '3b' in file:
             df['rank'] = df.apply(lambda x : _3B[x.qid][x.docno][0], axis=1)
             df['score'] = df.apply(lambda x : _3B[x.qid][x.docno][1], axis=1)
         else:
