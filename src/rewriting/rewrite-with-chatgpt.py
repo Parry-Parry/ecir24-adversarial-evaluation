@@ -21,7 +21,7 @@ def process_prompt(iteration, prompt):
 def process_prompt_prepend_text(iteration, prompt):
     prompts = json.load(open(f'chatgpt/text-rewrites-from-chatgpt-raw-prompt-{prompt}.json', 'r'))
 
-    df = pd.read_csv('../../data/bm25_19.tsv.gz', names=['qid', 'query', 'docid', 'score', 'rank', 'text'], header=1, sep='\t')
+    df = pd.read_csv('../../data/bm25_20.tsv.gz', names=['qid', 'query', 'docid', 'score', 'rank', 'text'], header=1, sep='\t')
     df = df[df['rank'].astype(int) <= 100]
 
     ret = []
