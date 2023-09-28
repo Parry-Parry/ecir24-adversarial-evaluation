@@ -17,7 +17,7 @@ def init_t5(hparams):
     return MonoT5ReRanker(model=hparams.model_name_or_path, batch_size=hparams.batch_size) 
 
 def init_reranker(hparams):
-    if hparams.model == 't5':
+    if 't5' in hparams.model:
         return init_t5(hparams)
     elif hparams.model == 'electra':
         return init_electra(hparams)
