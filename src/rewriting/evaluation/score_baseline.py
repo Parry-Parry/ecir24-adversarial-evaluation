@@ -70,7 +70,7 @@ def main(run_file : str,
     reranker = init_reranker(hparams)
     res = pd.read_json(run_file, lines=True, orient='records')
     res['qid'] = res['qid'].astype(str)
-    res['docno'] = res['docno'].astype(str)
+    res['docno'] = res['docid'].astype(str)
     res['text'] = res['text'].astype(str)
     res = reranker.transform(res)
     res.to_csv(output_file, sep='\t', index=False, header=True)
