@@ -3,7 +3,7 @@ from fire import Fire
 
 METRICS = ['MRC', 'Success Rate']
 #MODEL_DICT = {'bm25' : 'BM25', 'colbert' : 'ColBERT', 'tasb' : 'TAS-B', 't5' : 'MonoT5', 'electra' : 'MonoElectra'}
-MODEL_DICT = {'bm25' : 'BM25', 't5' : 'MonoT5', 'tasb' : 'TAS-B', 'electra' : 'MonoElectra'}
+MODEL_DICT = {'t5' : 'MonoT5', 'bm25' : 'BM25', 'tasb' : 'TAS-B', 'electra' : 'MonoElectra'}
 DATA_DICT = {'dl19' : 'DL19', 'dl20' : 'DL20'}
 #DATA_DICT = {'dl19' : 'DL19'}
 
@@ -33,11 +33,12 @@ def format_colour(value, colour_level, percent=False):
     else: return r'\cellcolor{' + 'pos' + f'!{colour_level}' + '}' f'$+{abs(value)}$'
 
 def format_mrc(mrc, sr, colour_level, sig):
-    if mrc < 0.: out = r'\cellcolor{' + 'neg' + f'!{colour_level}' + '}' + f'$-{abs(mrc)} ({abs(sr)}\%)$'
-    elif mrc==0.: out = r'\cellcolor{pos!0}' + f'$+{abs(mrc)} ({abs(sr)}\%)$'
-    else: out = r'\cellcolor{' + 'pos' + f'!{colour_level}' + '}' f'$+{abs(mrc)} ({abs(sr)}\%)$'
-    if sig: out += r'\sig'
-    else: out += r'\insig'
+    sig_tok = r'\sig' if sig else r'\insig'
+    colour_token = 'pos' if mrc >= 0. else 'neg'
+    sign = '+' if mrc >= 0. else '-'
+    if mrc == 0.: sign = ''
+    out = r'\cellcolor{' + colour_token + f'!{colour_level}' + '}' + f'${sign}{abs(mrc)}_' + '{\color{gray}\,\phantom{0}' + f'{abs(sr)}' + r'\%}$'
+    out += sig_tok
     return out
 
 def main(run_file : str, out_file : str):
@@ -61,12 +62,12 @@ def main(run_file : str, out_file : str):
         norm_val = min(norm_val, 50)
         return format_mrc(round(mrc, 1), round(sr * 100, 1), norm_val, sig)
     
-    preamble = r'\begin{tabular}{@{}lrrrrrrrrrrrr@{}}'
+    preamble = r'\begin{tabular}{@{}l' + ''.join(['rrrrrrrrrrrr']*len(DATA_DICT)) + r'@{}}'
     header = r'\toprule'
     columns = 'Token & ' + ' & '.join([r'\multicolumn{' + str(len(DATA_DICT)*3) + r'}{c}{' + f'{model}' + r'}' for _, model in MODEL_DICT.items()]) + r'\\'    
     # for each model column write each dataset from data_dict twice 
     datasets = '& ' + ' & '.join([' & '.join(r'\multicolumn{3}{c}{' + f'{data}' + r'}' for _, data in DATA_DICT.items())] * len(MODEL_DICT)) + r'\\'
-    metrics = '& ' + ' & '.join([' & '.join(['P', 'R', 'MRC (SR)'] * len(DATA_DICT))] * len(MODEL_DICT)) + r'\\'
+    metrics = '& ' + ' & '.join([' & '.join(['P', 'R', 'MRC (SR \%)'] * len(DATA_DICT))] * len(MODEL_DICT)) + r'\\'
     total = [preamble, header, columns, r'\midrule', datasets, r'\midrule', metrics, r'\midrule']
     for group, tokens in TOKEN_GROUPS.items():
         total.append(r'\midrule')
@@ -84,16 +85,10 @@ def main(run_file : str, out_file : str):
                     data_subset = model_subset[model_subset.dataset==data].copy()
                     mrc = data_subset[data_subset.metric=='MRC'].value.values[0]
                     sr = data_subset[data_subset.metric=='Success Rate'].value.values[0]
+                    sig = data_subset[data_subset.metric=='sig'].value.values[0]
                     row += POSITIONS[data_subset.position.values[0]] + ' & '
                     row += str(data_subset.n_tok.values[0]) + ' & '
-                    row += colour_combo(mrc, sr) + ' & '
-
-                    '''
-                    for metric in METRICS:
-                        metric_subset = data_subset[data_subset.metric==metric].copy()
-                        assert len(metric_subset) == 1
-                        row += colour_metric(metric_subset.value.values[0], metric) + ' & '
-                    '''
+                    row += colour_combo(mrc, sr, sig) + ' & '
 
             row = row[:-2] + r'\\'
             total.append(row)
