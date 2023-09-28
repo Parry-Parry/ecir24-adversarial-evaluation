@@ -38,8 +38,27 @@ def get_new_rank(qid, docno, score, lookup):
 
 def main(run_file : str, normal_dir : str, res_dump : str):
 
-    electra = build_rank_lookup(pd.read_csv(join(normal_dir, 'normal_electra.tsv'), sep='\t', index_col=False))
-    t5 = build_rank_lookup(pd.read_csv(join(normal_dir, 'normal_t5.tsv'), sep='\t', index_col=False))
+    if 'electra' in run_file:
+        lookup = build_rank_lookup(pd.read_csv(join(normal_dir, 'normal_electra.tsv'), sep='\t', index_col=False))
+    elif 't5.base' in run_file:
+        lookup = build_rank_lookup(pd.read_csv(join(normal_dir, 'normal_t5.base.tsv'), sep='\t', index_col=False))
+    elif 't5.small' in run_file:
+        lookup = build_rank_lookup(pd.read_csv(join(normal_dir, 'normal_t5.small.tsv'), sep='\t', index_col=False))
+    elif 't5.large' in run_file:
+        lookup = build_rank_lookup(pd.read_csv(join(normal_dir, 'normal_t5.large.tsv'), sep='\t', index_col=False))
+    elif 't5.3b' in run_file:
+        lookup = build_rank_lookup(pd.read_csv(join(normal_dir, 'normal_t5.3b.tsv'), sep='\t', index_col=False))
+    elif 'colbert' in run_file:
+        lookup = build_rank_lookup(pd.read_csv(join(normal_dir, 'normal_colbert.tsv'), sep='\t', index_col=False))
+    elif 'tasb' in run_file:
+        lookup = build_rank_lookup(pd.read_csv(join(normal_dir, 'normal_tasb.tsv'), sep='\t', index_col=False))
+    elif 't5' in run_file:
+        lookup = build_rank_lookup(pd.read_csv(join(normal_dir, 'normal_t5.base.tsv'), sep='\t', index_col=False))
+    elif 'bm25' in run_file:
+        lookup = build_rank_lookup(pd.read_csv(join(normal_dir, 'normal_bm25.tsv'), sep='\t', index_col=False))
+    else:
+        raise ValueError(run_file)
+
 
     def add_rank_change(df, lookup):
         df['rank_change'] = df.apply(lambda row : get_rank_change(row.qid, row.docno, row.augmented_score, lookup), axis=1)
@@ -53,7 +72,7 @@ def main(run_file : str, normal_dir : str, res_dump : str):
         print(f'{name} already exists')
         return
     res = pd.read_csv(run_file, sep='\t', index_col=False)
-    res = add_rank_change(res, t5 if 't5' in name else electra)
+    res = add_rank_change(res, lookup)
     res['score_change'] = res['augmented_score'] - res['score']
     res['success'] = res['rank_change'] > 0
 
