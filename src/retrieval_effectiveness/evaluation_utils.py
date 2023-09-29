@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from copy import deepcopy
 import pandas as pd
 from glob import glob
