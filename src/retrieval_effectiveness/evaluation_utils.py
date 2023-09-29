@@ -90,9 +90,9 @@ def __normalize_run(run, system_name, depth=1000):
     return run[['qid', 'Q0', 'docno', 'rank', 'score', 'system']]
 
 def run_best_and_worst_case_evaluation(model, track, dataset):
-    original_ranking = read_run(f'data/trec-runs/{track}/baseline_{model}.trec')
+    original_ranking = read_run(f'data/trec-runs/{track}/baseline_{model}.trec.gz')
     adversarial_rankings = []
-    for i in tqdm(glob(f'data/trec-runs/{track}/*{model}.trec'), 'Load Runs'):
+    for i in tqdm(glob(f'data/trec-runs/{track}/*{model}.trec.gz'), 'Load Runs'):
         if 'baseline' in i:
             continue
         adversarial_rankings += [read_run(i)]
@@ -101,24 +101,24 @@ def run_best_and_worst_case_evaluation(model, track, dataset):
 
 def parse_args():
     parser = argparse.ArgumentParser(prog='adversarial-evaluation-search-provider-perspective', description='Evaluation of adversarial attacks on search engines from the perspective of the search engine provider')
-    parser.add_argument('model', choices=['bm25', 'colbert', 't5', 'electra', 'tasb'], required=True)
-    parser.add_argument('track', choices=['dl19', 'dl20'], required=True)
+    parser.add_argument('--model', choices=['bm25', 'colbert', 't5', 'electra', 'tasb'], required=True)
+    parser.add_argument('--track', choices=['dl19', 'dl20'], required=True)
 
     return parser.parse_args()
 
 def main():
+    args = parse_args()
+
     import pyterrier as pt
     if not pt.started():
         pt.init()
-
-    args = parse_args()
     
     if args.track == 'dl19':
         dataset = pt.get_dataset('irds:msmarco-passage/trec-dl-2019/judged')
     elif args.track == 'dl20':
         dataset = pt.get_dataset('irds:msmarco-passage/trec-dl-2020/judged')
 
-    ret = run_best_and_worst_case_evaluation(args.model, dataset)
+    ret = run_best_and_worst_case_evaluation(args.model, args.track, dataset)
 
     ret.to_json('data/{args.track}-best-and-worst-case-evaluation-{args.model}.jsonl', lines=True, orient='records')
 
