@@ -23,7 +23,7 @@ def main(run_dir : str, normal_dir : str, out_dir : str, old : bool = False):
         colbert = {}
         bm25 = {}
     
-    files = [f for f in os.listdir(run_dir) if f.endswith('.tsv') and not f.startswith('normal')]
+    files = [f for f in os.listdir(run_dir) if not f.startswith('normal')]
 
     for file in files:
         if join(out_dir, file) in os.listdir(out_dir):

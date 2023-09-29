@@ -2,35 +2,27 @@ import pandas as pd
 from fire import Fire 
 
 METRICS = ['MRC', 'Success Rate']
-MODEL_DICT = {'t5.small' : r'monoT5$_\text{small}$', 't5.base' : r'monoT5$_\text{base}$', 't5.large' : r'monoT5$_\text{large}$', 't5.3b' : r'monoT5$_\text{3B}$'}
-#MODEL_DICT = {'t5' : 'MonoT5', 'bm25' : 'BM25', 'tasb' : 'TAS-B', 'electra' : 'MonoElectra'}
-#DATA_DICT = {'dl19' : 'DL19', 'dl20' : 'DL20'}
-DATA_DICT = {'dl19' : 'DL19'}
+#MODEL_DICT = {'bm25' : 'BM25', 'colbert' : 'ColBERT', 'tasb' : 'TAS-B', 't5' : 'MonoT5', 'electra' : 'MonoElectra'}
+MODEL_DICT = {'t5.small' : r'MonoT5$_\text{small}$', 't5.base' : r'MonoT5$_\text{base}$', 't5.large' : r'MonoT5$_\text{large}$', 't5.3b' : r'MonoT5$_\text{3B}$'}
+DATA_DICT = {'dl19' : 'DL19', 'dl20' : 'DL20'}
+#DATA_DICT = {'dl19' : 'DL19'}
 
-TOKEN_GROUPS = {
-    'Prompt Tokens' : ['true', 'false', 'relevant', 'relevanttrue', 'relevantfalse'],
-    'Control Tokens' : ['bar', 'baz', 'information', 'informationbar', 'informationbaz', 'relevantbar', 'informationtrue'],
-    'Synonyms' : ['pertinent', 'significant', 'related', 'associated', 'important'],
-    'Sub-Words' : ['relevancy', 'relevance', 'relevantly','irrelevant'],
-    'Misspellings' : ['relevanty', 'relevent', 'trues', 'falses']
+PROMPTS = {
+    'alpacca' : {
+        3 : 'XYZ',
+        10 : 'XYZ',
+    },
+    'chatgp' : {
+        2 : 'XYZ',
+        8 : 'XYZ',
+
+    }
 }
 
-POSITIONS = {
-    'start' : 's',
-    'end' : 'e',
-    'random' : 'r'
+LLM_SWAP = {
+    'alpacca' : 'Alpacca',
+    'chatgp' : 'ChatGPT'
 }
-
-def format_colour(value, colour_level, percent=False):
-    if percent:
-        if value >= 0.5:
-            return r'\cellcolor{' + 'pos' + f'!{colour_level}' + '}' f'${abs(value)}' + r'\%$'
-        else:
-            return r'\cellcolor{' + 'neg' + f'!{colour_level}' + '}' + f'${abs(value)}' + r'\%$'
-        
-    if value < 0.: return r'\cellcolor{' + 'neg' + f'!{colour_level}' + '}' + f'$-{abs(value)}$'
-    elif value==0.: return r'\cellcolor{pos!0}' + f'$+{abs(value)}$'
-    else: return r'\cellcolor{' + 'pos' + f'!{colour_level}' + '}' f'$+{abs(value)}$'
 
 def format_mrc(mrc, sr, colour_level, sig):
     sig_tok = r'\sig' if sig else r'\insig'
@@ -53,7 +45,7 @@ def main(run_file : str, out_file : str):
     print(max_vals)
     
     def colour_combo(mrc, sr, sig=False):
-        max_val = float(max_vals['MRC'])
+        max_val = max_vals['MRC']
         abs_val = abs(mrc)
         # min max normalise abs_val between max val and 0 
         norm_val = (abs_val - 0) / (max_val - 0)
@@ -61,23 +53,24 @@ def main(run_file : str, out_file : str):
         norm_val = min(norm_val, 50)
         return format_mrc(round(mrc, 1), round(sr * 100, 1), norm_val, sig)
     
-    preamble = r'\begin{tabular}{@{}lrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr@{}}'
+    preamble = r'\begin{tabular}{@{}llrrrrrrrrrrrr@{}}'
     header = r'\toprule'
-    columns = 'Token & ' + ' & '.join([r'\multicolumn{' + str(len(DATA_DICT)*3) + r'}{c}{' + f'{model}' + r'}' for _, model in MODEL_DICT.items()]) + r'\\'    
+    columns = 'LLM & Prompt & ' + ' & '.join([r'\multicolumn{' + str(len(DATA_DICT)*3) + r'}{c}{' + f'{model}' + r'}' for _, model in MODEL_DICT.items()]) + r'\\'    
     # for each model column write each dataset from data_dict twice 
     datasets = '& ' + ' & '.join([' & '.join(r'\multicolumn{3}{c}{' + f'{data}' + r'}' for _, data in DATA_DICT.items())] * len(MODEL_DICT)) + r'\\'
     metrics = '& ' + ' & '.join([' & '.join(['P', 'R', 'MRC SR'] * len(DATA_DICT))] * len(MODEL_DICT)) + r'\\'
     total = [preamble, header, columns, r'\midrule', datasets, r'\midrule', metrics, r'\midrule']
-    for group, tokens in TOKEN_GROUPS.items():
+    for group, prompts in PROMPTS.items():
+        group_subset = df[df.llm==group].copy()
         total.append(r'\midrule')
-        total.append(r'\multicolumn{13}{l}{' + group + r'}\\')
+        total.append(r'\multicolumn{13}{l}{' + LLM_SWAP[group] + r'}\\')
         total.append(r'\midrule')
-        for token in tokens:
+        for id, description in prompts.items():
             row = ''
-            token_subset = df[df.token==token].copy()
-            row += token + ' & '
+            prompt_subset = group_subset[group_subset.prompt==id].copy()
+            row += group + ' & ' + description + ' & '
             for val, _ in MODEL_DICT.items():
-                model_subset = token_subset[token_subset.model==val].copy()
+                model_subset = prompt_subset[prompt_subset.model==val].copy()
                 print(model_subset)
                 assert len(model_subset) == len(DATA_DICT) * 3
                 for data, _ in DATA_DICT.items():
@@ -85,13 +78,11 @@ def main(run_file : str, out_file : str):
                     mrc = float(data_subset[data_subset.metric=='MRC'].value.values[0])
                     sr = float(data_subset[data_subset.metric=='Success Rate'].value.values[0])
                     sig = bool(data_subset[data_subset.metric=='sig'].value.values[0])
-                    row += POSITIONS[data_subset.position.values[0]] + ' & '
-                    row += str(data_subset.n_tok.values[0]) + ' & '
                     row += colour_combo(mrc, sr, sig) + ' & '
+
             row = row[:-2] + r'\\'
             total.append(row)
     total.append(r'\bottomrule')
-    total.append(r'\label{tab:transfer}')
     total.append(r'\end{tabular}')
     with open(out_file, 'w') as f:
         f.write('\n'.join(total))

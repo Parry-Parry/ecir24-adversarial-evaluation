@@ -2,8 +2,8 @@ import pandas as pd
 from fire import Fire 
 
 METRICS = ['MRC', 'Success Rate']
-#MODEL_DICT = {'bm25' : 'BM25', 'colbert' : 'ColBERT', 'tasb' : 'TAS-B', 't5' : 'MonoT5', 'electra' : 'MonoElectra'}
-MODEL_DICT = {'t5' : 'MonoT5', 'bm25' : 'BM25', 'tasb' : 'TAS-B', 'electra' : 'MonoElectra'}
+MODEL_DICT = {'bm25' : 'BM25', 'colbert' : 'ColBERT', 'tasb' : 'TAS-B', 't5' : 'MonoT5', 'electra' : 'MonoElectra'}
+#MODEL_DICT = {'t5' : 'MonoT5', 'bm25' : 'BM25', 'tasb' : 'TAS-B', 'electra' : 'MonoElectra'}
 DATA_DICT = {'dl19' : 'DL19', 'dl20' : 'DL20'}
 #DATA_DICT = {'dl19' : 'DL19'}
 
@@ -37,8 +37,7 @@ def format_mrc(mrc, sr, colour_level, sig):
     colour_token = 'pos' if mrc >= 0. else 'neg'
     sign = '+' if mrc >= 0. else '-'
     if mrc == 0.: sign = ''
-    out = r'\cellcolor{' + colour_token + f'!{colour_level}' + '}' + f'${sign}{abs(mrc)}_' + '{\color{gray}\,\phantom{0}' + f'{abs(sr)}' + r'\%}$'
-    out += sig_tok
+    out = r'\cellcolor{' + colour_token + f'!{colour_level}' + '}' + f'${sign}{abs(mrc)}' + sig_tok + '_{\color{gray}\,\phantom{0}' + f'{abs(sr)}' + r'}$' 
     return out
 
 def main(run_file : str, out_file : str):
@@ -54,20 +53,20 @@ def main(run_file : str, out_file : str):
     print(max_vals)
     
     def colour_combo(mrc, sr, sig=False):
-        max_val = max_vals['MRC']
+        max_val = float(max_vals['MRC'])
         abs_val = abs(mrc)
         # min max normalise abs_val between max val and 0 
         norm_val = (abs_val - 0) / (max_val - 0)
         norm_val = round(norm_val * 50)
         norm_val = min(norm_val, 50)
-        return format_mrc(round(mrc, 1), round(sr * 100, 1), norm_val, sig)
+        return format_mrc(round(mrc, 1), round(sr * 100), norm_val, sig)
     
-    preamble = r'\begin{tabular}{@{}l' + ''.join(['rrrrrrrrrrrr']*len(DATA_DICT)) + r'@{}}'
+    preamble = r'\begin{tabular}{@{}lrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr@{}}'
     header = r'\toprule'
     columns = 'Token & ' + ' & '.join([r'\multicolumn{' + str(len(DATA_DICT)*3) + r'}{c}{' + f'{model}' + r'}' for _, model in MODEL_DICT.items()]) + r'\\'    
     # for each model column write each dataset from data_dict twice 
     datasets = '& ' + ' & '.join([' & '.join(r'\multicolumn{3}{c}{' + f'{data}' + r'}' for _, data in DATA_DICT.items())] * len(MODEL_DICT)) + r'\\'
-    metrics = '& ' + ' & '.join([' & '.join(['P', 'R', 'MRC (SR \%)'] * len(DATA_DICT))] * len(MODEL_DICT)) + r'\\'
+    metrics = '& ' + ' & '.join([' & '.join(['P', 'R', 'MRC SR'] * len(DATA_DICT))] * len(MODEL_DICT)) + r'\\'
     total = [preamble, header, columns, r'\midrule', datasets, r'\midrule', metrics, r'\midrule']
     for group, tokens in TOKEN_GROUPS.items():
         total.append(r'\midrule')
@@ -80,19 +79,19 @@ def main(run_file : str, out_file : str):
             for val, _ in MODEL_DICT.items():
                 model_subset = token_subset[token_subset.model==val].copy()
                 print(model_subset)
-                assert len(model_subset) == len(DATA_DICT) * 2
+                assert len(model_subset) == len(DATA_DICT) * 3
                 for data, _ in DATA_DICT.items():
                     data_subset = model_subset[model_subset.dataset==data].copy()
-                    mrc = data_subset[data_subset.metric=='MRC'].value.values[0]
-                    sr = data_subset[data_subset.metric=='Success Rate'].value.values[0]
-                    sig = data_subset[data_subset.metric=='sig'].value.values[0]
+                    mrc = float(data_subset[data_subset.metric=='MRC'].value.values[0])
+                    sr = float(data_subset[data_subset.metric=='Success Rate'].value.values[0])
+                    sig = bool(data_subset[data_subset.metric=='sig'].value.values[0])
                     row += POSITIONS[data_subset.position.values[0]] + ' & '
                     row += str(data_subset.n_tok.values[0]) + ' & '
                     row += colour_combo(mrc, sr, sig) + ' & '
-
             row = row[:-2] + r'\\'
             total.append(row)
     total.append(r'\bottomrule')
+    total.append(r'\label{tab:transfer}')
     total.append(r'\end{tabular}')
     with open(out_file, 'w') as f:
         f.write('\n'.join(total))

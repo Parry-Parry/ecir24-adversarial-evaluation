@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 def main(script : str, run_dir : str, normal_dir : str, output_dir : str):
     main_args = ['python3', script]
-    files = [f for f in os.listdir(run_dir) if f.endswith('.tsv.gz') and not f.startswith('normal')]
+    files = [f for f in os.listdir(run_dir) if not f.startswith('normal')]
 
     total = len(files) 
 
