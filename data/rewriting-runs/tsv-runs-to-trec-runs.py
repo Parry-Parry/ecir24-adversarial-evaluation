@@ -24,7 +24,7 @@ def persist_run(run, model, path, score):
     run[['qid', 'q0', 'docno', 'rank', 'score', 'system']].to_csv(path, sep=' ', index=False, header=False)
 
 def tsv_runs_to_trec_runs(track, model):
-    runs = glob(f'{track}/*{model}.gz_rank_changes.tsv.gz')
+    runs = glob(f'{track}/*{model}.tsv.gz')
 
     # format baseline
     persist_run(read_run(runs[0]), model, f'trec-runs/{track}/baseline_{model}.trec.gz', 'score')
