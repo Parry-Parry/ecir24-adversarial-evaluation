@@ -31,7 +31,13 @@ def tsv_runs_to_trec_runs(track, model):
 
     for i in tqdm(runs):
         run_name = i.split('/')[-1].split(f'.tsv.gz')[0]
-        persist_run(read_run(i), model, f'data/trec-runs/{track}/{run_name}.trec.gz', 'augmented_score')
+        if '/normal_colbert.tsv.gz' in i:
+            continue
+        try:
+            persist_run(read_run(i), model, f'data/trec-runs/{track}/{run_name}.trec.gz', 'augmented_score')
+        except Exception as e:
+            print(i)
+            raise e
 
 for track in ['dl19', 'dl20']:
     for model in ['bm25', 'colbert', 't5', 'electra', 'tasb']:
