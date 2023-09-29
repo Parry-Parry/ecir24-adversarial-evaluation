@@ -120,7 +120,7 @@ def main():
 
     ret = run_best_and_worst_case_evaluation(args.model, args.track, dataset)
 
-    ret.to_json('data/{args.track}-best-and-worst-case-evaluation-{args.model}.jsonl', lines=True, orient='records')
+    ret.to_json(f'data/{args.track}-best-and-worst-case-evaluation-{args.model}.jsonl', lines=True, orient='records')
 
 if __name__ == '__main__':
     main()
