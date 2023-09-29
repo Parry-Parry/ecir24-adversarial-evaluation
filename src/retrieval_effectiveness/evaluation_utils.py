@@ -1,7 +1,9 @@
+#!/usr/bin/env python3
 from copy import deepcopy
 import pandas as pd
 from glob import glob
 from tqdm import tqdm
+import argparse
 
 
 def report_best_and_worst_case_results(qrels, topics, original_ranking, adversarial_rankings, model_name):
@@ -87,29 +89,38 @@ def __normalize_run(run, system_name, depth=1000):
 
     return run[['qid', 'Q0', 'docno', 'rank', 'score', 'system']]
 
-def run_best_and_worst_case_evaluation(model, dataset):
-    original_ranking = read_run(f'data/trec-runs/baseline_{model}.trec')
+def run_best_and_worst_case_evaluation(model, track, dataset):
+    original_ranking = read_run(f'data/trec-runs/{track}/baseline_{model}.trec.gz')
     adversarial_rankings = []
-    for i in tqdm(glob(f'data/trec-runs/*{model}.trec'), 'Load Runs'):
+    for i in tqdm(glob(f'data/trec-runs/{track}/*{model}.trec.gz'), 'Load Runs'):
         if 'baseline' in i:
             continue
         adversarial_rankings += [read_run(i)]
     adversarial_rankings = adversarial_rankings
     return report_best_and_worst_case_results(dataset.get_qrels(), dataset.get_topics(), original_ranking, adversarial_rankings, model)
 
+def parse_args():
+    parser = argparse.ArgumentParser(prog='adversarial-evaluation-search-provider-perspective', description='Evaluation of adversarial attacks on search engines from the perspective of the search engine provider')
+    parser.add_argument('--model', choices=['bm25', 'colbert', 't5', 'electra', 'tasb'], required=True)
+    parser.add_argument('--track', choices=['dl19', 'dl20'], required=True)
+
+    return parser.parse_args()
+
 def main():
+    args = parse_args()
+
     import pyterrier as pt
     if not pt.started():
         pt.init()
-    dataset = pt.get_dataset('irds:msmarco-passage/trec-dl-2019/judged')
-
-    ret = []
     
-    for model in ['t5', 'electra']:
-        ret += [run_best_and_worst_case_evaluation(model, dataset)]
+    if args.track == 'dl19':
+        dataset = pt.get_dataset('irds:msmarco-passage/trec-dl-2019/judged')
+    elif args.track == 'dl20':
+        dataset = pt.get_dataset('irds:msmarco-passage/trec-dl-2020/judged')
 
-    ret = pd.concat(ret)
-    ret.to_json('best-and-worst-case-evaluation.jsonl', lines=True, orient='records')
+    ret = run_best_and_worst_case_evaluation(args.model, args.track, dataset)
+
+    ret.to_json(f'data/{args.track}-best-and-worst-case-evaluation-{args.model}.jsonl', lines=True, orient='records')
 
 if __name__ == '__main__':
     main()
