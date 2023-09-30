@@ -7,13 +7,23 @@ from glob import glob
 def read_run(path):
     return pd.read_csv(path, sep='\t')
 
-def persist_run(run, model, path, score):
+def parse_allowed_elements(track):
+    run = pd.read_csv(f'data/{track}-baseline-bm25.trec.gz', sep='\t')
+    run = run.sort_values(["qid", "score", "docno"], ascending=[True, False, False]).reset_index()
+    run = run.groupby("qid")[["qid", "docno", "score", "system"]].head(100)
+    
+    return {(i['qid'], i['docno']) for _, i in run.iterrows()}
+    
+
+def persist_run(run, model, path, score, allowed_elements):
     run['system'] = model
     run['score'] = run[score]
     
     #normalize runs, code from trectools
     run = run.sort_values(["qid", "score", "docno"], ascending=[True, False, False]).reset_index()
     run['q0'] = 0
+    run['to_remove'] = run.apply(lambda i: (i['qid'], i['docno']) in allowed_elements)
+    run = run[run['to_remove'] == True]
 
     run = run.groupby("qid")[["qid", "q0", "docno", "score", "system"]].head(100)
 
@@ -25,6 +35,7 @@ def persist_run(run, model, path, score):
 
 def tsv_runs_to_trec_runs(track, model):
     runs = glob(f'data/runs/{track}/*{model}.tsv.gz')
+    allowed_elements = parse_allowed_elements(track)
 
     # format baseline
     persist_run(read_run(runs[0]), model, f'data/trec-runs/{track}/baseline_{model}.trec.gz', 'score')
