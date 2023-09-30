@@ -8,9 +8,11 @@ def read_run(path):
     return pd.read_csv(path, sep='\t')
 
 def parse_allowed_elements(track):
-    run = pd.read_csv(f'../{track}-baseline-bm25.trec.gz', sep='\t')
+    run = pd.read_csv(f'data/{track}-baseline-bm25.trec.gz', names=['qid', 'q0', 'docno', 'rank', 'score', 'model'], header=None, sep='\s+')
+    run['qid'] = run['qid'].astype(str)
+    run['docno'] = run['docno'].astype(str)
     run = run.sort_values(["qid", "score", "docno"], ascending=[True, False, False]).reset_index()
-    run = run.groupby("qid")[["qid", "docno", "score", "system"]].head(100)
+    run = run.groupby("qid")[["qid", "docno", "score"]].head(100)
     
     return {(i['qid'], i['docno']) for _, i in run.iterrows()}
     
