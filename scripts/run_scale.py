@@ -9,10 +9,10 @@ MODELS = {
     't5.3b' : 'castorini/monot5-3b-msmarco',
 }
 
-def main(script : str, run_dir : str, output_dir : str, name : str = 't5.3b'):
+def main(script : str, run_dir : str, output_dir : str, name : str = 't5.3b', batch_size : int = None):
     BATCH_SIZES = {
-    't5.small' : 128,
-    't5.large' : 128,
+    't5.small' : 256,
+    't5.large' : 256,
     't5.3b' : 24,
     }
     main_args = ['python', script]
@@ -21,6 +21,7 @@ def main(script : str, run_dir : str, output_dir : str, name : str = 't5.3b'):
     total = len(files) 
 
     progress_bar = tqdm(total=total)
+    if batch_size is None: batch_size = BATCH_SIZES[name]
 
     for file in files:
         ckpt = MODELS[name]

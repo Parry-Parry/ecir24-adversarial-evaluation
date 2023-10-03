@@ -63,13 +63,16 @@ def main(run_file : str, out_file : str):
     
     preamble = r'\begin{tabular}{@{}lrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr@{}}'
     header = r'\toprule'
-    columns = 'Token & ' + ' & '.join([r'\multicolumn{' + str(len(DATA_DICT)*3) + r'}{c}{' + f'{model}' + r'}' for _, model in MODEL_DICT.items()]) + r'\\'    
+    columns = 'Token & ' + ' & '.join([r'\multicolumn{' + str(3) + r'}{c}{' + f'{model}' + r'}' for _, model in MODEL_DICT.items()]) + r'\\'    
     # for each model column write each dataset from data_dict twice 
-    datasets = '& ' + ' & '.join([' & '.join(r'\multicolumn{3}{c}{' + f'{data}' + r'}' for _, data in DATA_DICT.items())] * len(MODEL_DICT)) + r'\\'
-    metrics = '& ' + ' & '.join([' & '.join(['P', 'R', 'MRC SR'] * len(DATA_DICT))] * len(MODEL_DICT)) + r'\\'
-    total = [preamble, header, columns, r'\midrule', metrics, r'\midrule']
+    metrics = '& ' + ' & '.join(['P', 'R', 'MRC SR'] * len(MODEL_DICT)) + r'\\'
+    total = [preamble, header]
+    per_set = [columns, r'\midrule', metrics, r'\midrule']
     for data, name in DATA_DICT.items():
-        total.append(r'\multicolumn{13}{l}{' + name + r'}\\')
+        total.append(r'\multicolumn{13}{c}{\textbf{' + name + r'}}\\')
+        total.append(r'\midrule')
+        total.extend(per_set)
+
         subset = df[df.dataset==data].copy()
         for group, tokens in TOKEN_GROUPS.items():
             total.append(r'\midrule')
