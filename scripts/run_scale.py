@@ -35,7 +35,7 @@ def main(script : str, run_dir : str, output_dir : str, name : str = 't5.3b', ba
         args.extend(['--output_file', output_file])
         args.extend(['--model', name])
         args.extend(['--model_name_or_path', ckpt])
-        args.extend(['--batch_size', str(BATCH_SIZES[name])])
+        args.extend(['--batch_size', str(batch_size)])
         sp.run(args)
         progress_bar.update(1)
 
