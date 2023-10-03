@@ -8,9 +8,17 @@ def read_run(path):
     return pd.read_csv(path, sep='\t')
 
 def parse_allowed_elements(track):
-    run = pd.read_csv(f'../{track}-baseline-bm25.trec.gz', names=['qid', 'q0', 'docno', 'rank', 'score', 'model'], header=None, sep='\s+')
+    if track == 'dl19':
+        runs = glob('../bm25_19-x*.jsonl')
+    elif track == 'dl20':
+        runs = glob('../bm25_20-x*.jsonl')
+
+    runs = [pd.read_json(i, lines=True) for i in runs]
+    run = pd.concat(runs)
+
+#    run = pd.read_csv(f'../{track}-baseline-bm25.trec.gz', names=['qid', 'q0', 'docno', 'rank', 'score', 'model'], header=None, sep='\s+')
     run['qid'] = run['qid'].astype(str)
-    run['docno'] = run['docno'].astype(str)
+    run['docno'] = run['docid'].astype(str)
     run = run.sort_values(["qid", "score", "docno"], ascending=[True, False, False]).reset_index()
     run = run.groupby("qid")[["qid", "docno", "score"]].head(100)
     
@@ -24,9 +32,8 @@ def persist_run(run, model, path, score, allowed_elements):
     #normalize runs, code from trectools
     run = run.sort_values(["qid", "score", "docno"], ascending=[True, False, False]).reset_index()
     run['q0'] = 0
-    run['to_remove'] = run.apply(lambda i: (i['qid'], i['docno']) in allowed_elements, axis=1)
+    run['to_remove'] = run.apply(lambda i: (str(i['qid']), str(i['docno'])) in allowed_elements, axis=1)
     run = run[run['to_remove'] == True]
-
     run = run.groupby("qid")[["qid", "q0", "docno", "score", "system"]].head(100)
 
     # Make sure that rank position starts by 1

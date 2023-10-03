@@ -63,7 +63,7 @@ def __calculate_run(original_ranking, query_doc_pairs_to_replace, adversarial_ra
         i = deepcopy(i)
         if (str(i['qid']), str(i['docno'])) in query_doc_pairs_to_replace:
             i['score'] = adversarial_rankings[i['qid']][i['docno']]
-            
+
         ret.append(i)
 
     return __normalize_run(pd.DataFrame(ret), system_name)
@@ -89,10 +89,10 @@ def __normalize_run(run, system_name, depth=1000):
 
     return run[['qid', 'Q0', 'docno', 'rank', 'score', 'system']]
 
-def run_best_and_worst_case_evaluation(model, track, dataset):
-    original_ranking = read_run(f'data/trec-runs/{track}/baseline_{model}.trec.gz')
+def run_best_and_worst_case_evaluation(model, track, dataset, src_stuff):
+    original_ranking = read_run(f'data/{src_stuff}/trec-runs/{track}/baseline_{model}.trec.gz')
     adversarial_rankings = []
-    for i in tqdm(glob(f'data/trec-runs/{track}/*{model}.trec.gz'), 'Load Runs'):
+    for i in tqdm(glob(f'data/{src_stuff}/trec-runs/{track}/*{model}.trec.gz'), 'Load Runs'):
         if 'baseline' in i:
             continue
         adversarial_rankings += [read_run(i)]
@@ -103,6 +103,7 @@ def parse_args():
     parser = argparse.ArgumentParser(prog='adversarial-evaluation-search-provider-perspective', description='Evaluation of adversarial attacks on search engines from the perspective of the search engine provider')
     parser.add_argument('--model', choices=['bm25', 'colbert', 't5', 'electra', 'tasb'], required=True)
     parser.add_argument('--track', choices=['dl19', 'dl20'], required=True)
+    parser.add_argument('--src', choices=['', 'rewriting-runs'], required=True)
 
     return parser.parse_args()
 
@@ -118,9 +119,11 @@ def main():
     elif args.track == 'dl20':
         dataset = pt.get_dataset('irds:msmarco-passage/trec-dl-2020/judged')
 
-    ret = run_best_and_worst_case_evaluation(args.model, args.track, dataset)
+    ret = run_best_and_worst_case_evaluation(args.model, args.track, dataset, args.src)
 
-    ret.to_json(f'data/{args.track}-best-and-worst-case-evaluation-{args.model}.jsonl', lines=True, orient='records')
+    suffix = args.src.replace('/', '-')
+
+    ret.to_json(f'data/{args.track}{suffix}-best-and-worst-case-evaluation-{args.model}.jsonl', lines=True, orient='records')
 
 if __name__ == '__main__':
     main()
