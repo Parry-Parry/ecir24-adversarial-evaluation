@@ -3,7 +3,6 @@ import subprocess as sp
 from fire import Fire
 from tqdm import tqdm
 
-'''
 MODELS = {
     'electra' : 'crystina-z/monoELECTRA_LCE_nneg31',
     't5.base' : 'castorini/monot5-base-msmarco',
@@ -14,10 +13,7 @@ MODELS = {
     'colbert' : 'http://www.dcs.gla.ac.uk/~craigm/ecir2021-tutorial/colbert_model_checkpoint.zip',
     'bm25' : 'na'
 }
-'''
-MODELS = {
-    't5.3b' : 'castorini/monot5-3b-msmarco',
-}
+
 
 
 def main(script : str, file : str, output_dir : str, batch_size : int = 128):

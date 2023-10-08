@@ -2,10 +2,8 @@ import pandas as pd
 from fire import Fire 
 
 METRICS = ['MRC', 'Success Rate']
-MODEL_DICT = {'t5.small' : r'monoT5$_\text{small}$', 't5.base' : r'monoT5$_\text{base}$', 't5.large' : r'monoT5$_\text{large}$', 't5.3b' : r'monoT5$_\text{3B}$'}
-#MODEL_DICT = {'t5' : 'MonoT5', 'bm25' : 'BM25', 'tasb' : 'TAS-B', 'electra' : 'MonoElectra'}
-#DATA_DICT = {'dl19' : 'DL19', 'dl20' : 'DL20'}
-DATA_DICT = {'dl19' : 'DL19'}
+MODEL_DICT = {'bm25' : 'BM25', 'colbert' : 'ColBERT', 'tasb' : 'TAS-B', 't5' : 'MonoT5', 'electra' : 'MonoElectra'}
+DATA_DICT = {'dl19' : 'DL19', 'dl20' : 'DL20'}
 
 TOKEN_GROUPS = {
     'Prompt Tokens' : ['true', 'false', 'relevant', 'relevanttrue', 'relevantfalse'],
@@ -37,7 +35,7 @@ def format_mrc(mrc, sr, colour_level, sig):
     colour_token = 'pos' if mrc >= 0. else 'neg'
     sign = '+' if mrc >= 0. else '-'
     if mrc == 0.: sign = ''
-    out = r'\cellcolor{' + colour_token + f'!{colour_level}' + '}' + f'${sign}{abs(mrc)}' + sig_tok + '_{\color{gray}\,\phantom{0}' + f'{abs(sr)}' + r'\%}$' 
+    out = r'\cellcolor{' + colour_token + f'!{colour_level}' + '}' + f'${sign}{abs(mrc)}' + sig_tok + '_{\color{gray}\,\phantom{0}' + f'{abs(sr)}' + r'}$' 
     return out
 
 def main(run_file : str, out_file : str):
@@ -59,37 +57,41 @@ def main(run_file : str, out_file : str):
         norm_val = (abs_val - 0) / (max_val - 0)
         norm_val = round(norm_val * 50)
         norm_val = min(norm_val, 50)
-        return format_mrc(round(mrc, 1), round(sr * 100, 1), norm_val, sig)
+        return format_mrc(round(mrc, 1), round(sr * 100), norm_val, sig)
     
     preamble = r'\begin{tabular}{@{}lrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr@{}}'
     header = r'\toprule'
-    columns = 'Token & ' + ' & '.join([r'\multicolumn{' + str(len(DATA_DICT)*3) + r'}{c}{' + f'{model}' + r'}' for _, model in MODEL_DICT.items()]) + r'\\'    
+    columns = 'Token & ' + ' & '.join([r'\multicolumn{' + str(3) + r'}{c}{' + f'{model}' + r'}' for _, model in MODEL_DICT.items()]) + r'\\'    
     # for each model column write each dataset from data_dict twice 
-    datasets = '& ' + ' & '.join([' & '.join(r'\multicolumn{3}{c}{' + f'{data}' + r'}' for _, data in DATA_DICT.items())] * len(MODEL_DICT)) + r'\\'
-    metrics = '& ' + ' & '.join([' & '.join(['P', 'R', 'MRC SR'] * len(DATA_DICT))] * len(MODEL_DICT)) + r'\\'
-    total = [preamble, header, columns, r'\midrule', datasets, r'\midrule', metrics, r'\midrule']
-    for group, tokens in TOKEN_GROUPS.items():
+    metrics = '& ' + ' & '.join(['P', 'R', 'MRC SR'] * len(MODEL_DICT)) + r'\\'
+    total = [preamble, header]
+    per_set = [columns, r'\midrule', metrics, r'\midrule']
+    for data, name in DATA_DICT.items():
+        total.append(r'\multicolumn{13}{c}{\textbf{' + name + r'}}\\')
         total.append(r'\midrule')
-        total.append(r'\multicolumn{13}{l}{' + group + r'}\\')
-        total.append(r'\midrule')
-        for token in tokens:
-            row = ''
-            token_subset = df[df.token==token].copy()
-            row += token + ' & '
-            for val, _ in MODEL_DICT.items():
-                model_subset = token_subset[token_subset.model==val].copy()
-                print(model_subset)
-                assert len(model_subset) == len(DATA_DICT) * 3
-                for data, _ in DATA_DICT.items():
-                    data_subset = model_subset[model_subset.dataset==data].copy()
-                    mrc = float(data_subset[data_subset.metric=='MRC'].value.values[0])
-                    sr = float(data_subset[data_subset.metric=='Success Rate'].value.values[0])
-                    sig = bool(data_subset[data_subset.metric=='sig'].value.values[0])
-                    row += POSITIONS[data_subset.position.values[0]] + ' & '
-                    row += str(data_subset.n_tok.values[0]) + ' & '
+        total.extend(per_set)
+
+        subset = df[df.dataset==data].copy()
+        for group, tokens in TOKEN_GROUPS.items():
+            total.append(r'\midrule')
+            total.append(r'\multicolumn{13}{l}{' + group + r'}\\')
+            total.append(r'\midrule')
+            for token in tokens:
+                row = ''
+                token_subset = subset[subset.token==token].copy()
+                row += token + ' & '
+                for val, _ in MODEL_DICT.items():
+                    model_subset = token_subset[token_subset.model==val].copy()
+                    print(model_subset)
+                    assert len(model_subset) == 3
+                    mrc = float(model_subset[model_subset.metric=='MRC'].value.values[0])
+                    sr = float(model_subset[model_subset.metric=='Success Rate'].value.values[0])
+                    sig = bool(model_subset[model_subset.metric=='sig'].value.values[0])
+                    row += POSITIONS[model_subset.position.values[0]] + ' & '
+                    row += str(model_subset.n_tok.values[0]) + ' & '
                     row += colour_combo(mrc, sr, sig) + ' & '
-            row = row[:-2] + r'\\'
-            total.append(row)
+                row = row[:-2] + r'\\'
+                total.append(row)
     total.append(r'\bottomrule')
     total.append(r'\label{tab:transfer}')
     total.append(r'\end{tabular}')
