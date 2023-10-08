@@ -17,7 +17,7 @@ MODELS = {
 
 
 def main(script : str, file : str, output_dir : str, batch_size : int = 128):
-    main_args = ['python', script]
+    main_args = ['python', '-m', script]
 
     total = len(MODELS)
 
