@@ -9,7 +9,7 @@ MODELS = {
 }
 
 def main(script : str, run_dir : str, output_dir : str, batch_size : int = 128):
-    main_args = ['python', script]
+    main_args = ['python', '-m', script]
     files = [f for f in os.listdir(run_dir) if f.endswith('.tsv.gz') and 'prompt' in f]
 
     total = len(files) * len(MODELS)

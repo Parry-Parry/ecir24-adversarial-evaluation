@@ -4,12 +4,14 @@ from chatnoir_api.chat import ChatNoirChatClient
 import pandas as pd
 from tqdm import tqdm
 import json
+from os.path import join
+from fire import Fire
 
 chat_client = ChatNoirChatClient()
 
-def process_prompt(iteration, prompt, filename):
+def process_prompt(iteration, prompt, filename, dir):
     prompt_str = json.load(open('prompts.json', 'r'))[prompt]
-    output_file = f'../../data/llm-rewrite/{filename}_alpacca_prompt_{prompt}_iter_{iteration}.tsv.gz'
+    output_file = join(dir, 'llm-rewrite', f'{filename}_alpacca_prompt_{prompt}_iter_{iteration}.tsv.gz')
 
     try:
         pd.read_csv(output_file, names=['qid', 'query', 'docid', 'score', 'rank', 'text'], sep='\t')
@@ -19,7 +21,7 @@ def process_prompt(iteration, prompt, filename):
         pass
 
     #df = pd.read_csv('../../data/llm-rewrite/bm25_19_sample_1000.tsv.gz', names=['qid', 'query', 'docid', 'score', 'rank', 'text'], sep='\t')
-    df = pd.read_json(f'../../data/{filename}.jsonl', lines=True)
+    df = pd.read_json(join(dir, f'/{filename}.jsonl', lines=True))
     ret = []
     for _, i in tqdm(list(df.iterrows())):
         i = i.to_dict()
@@ -34,14 +36,17 @@ def process_prompt(iteration, prompt, filename):
     ret = pd.DataFrame(ret)
     ret.to_csv(output_file, sep='\t', header=False, index=False)
 
-
-for iteration in ['1']:
+def main(data_dir : str):
+    for iteration in ['1']:
     #in the pilot study, we selected prompt 10 and 3 as the most effective ones:
-    for prompt in ['3', '10']:
-        for filename in ['bm25_20-xaa', 'bm25_20-xab', 'bm25_20-xac', 'bm25_20-xad', 'bm25_20-xae', 'bm25_20-xae']:
+        for prompt in ['3', '10']:
+            for filename in ['bm25_20-xaa', 'bm25_20-xab', 'bm25_20-xac', 'bm25_20-xad', 'bm25_20-xae', 'bm25_20-xae']:
 
-    #for the pilot study
-    #for prompt in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']:
+        #for the pilot study
+        #for prompt in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']:
 
-            process_prompt(iteration, prompt, filename)
+                process_prompt(iteration, prompt, filename, data_dir)
+
+if __name__ == '__main__':
+    Fire(main)
 
