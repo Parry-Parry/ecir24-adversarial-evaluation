@@ -1,7 +1,16 @@
-# ECIR Context Agnostic Ranking Attacks
-Experiments for Seq2Seq Ranking Attacks
+# Analyzing Adversarial Attacks on Sequence-to-Sequence Relevance Models
+
+Experiments for evaluating Seq2Seq Ranking Attacks
 
 ## Usage
+
+TODO:
+- Installation
+- Dependencies
+- Mining
+- Injection
+- Re-writing
+- Evaluation
 
 ## Package Structure
 ```
