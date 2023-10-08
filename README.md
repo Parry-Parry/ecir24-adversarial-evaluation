@@ -1,18 +1,38 @@
 # ECIR Context Agnostic Ranking Attacks
 Experiments for Seq2Seq Ranking Attacks
 
-## Notes
+## Usage
 
-### data/bm25_19.tsv.gz
+## Package Structure
+```
+advseq2seq
+├───directory-processing: Compression and join scripts for retrieval effectiveness calculation
+├───re-writing: LLM rewrite functions for processing set of documents
+│   └───evaluation: Evaluate rewritten documents
+├───retrieval_effectiveness: Evaluate retrieval effectiveness
+└───stuffing: Keyword Stuffing
+    ├───evaluation: Evaluation over re-rankers
+    ├───injection: Keyword stuffing from some token file
+    └───table_generation: Latex table generation
+```
 
-gzip compressed DL-19 results for BM25 
-
-File is a tsv (sep='\t')
-
-Columns:
-* qid : string, query_id
-* query : string, query text
-* docno : string, doc_id
-* score : float, bm25 score
-* rank : integer, automated terrier rank
-* text : string, document text
+## Data Structure
+```
+data
+├───intermediate: Splits of BM25 scored documents for efficient API querying
+├───llm-rewrite
+│   ├───bm25_19_in_progress: Intermediate prompt runs for efficient API querying
+│   ├───bm25_20_in_progress: Intermediate prompt runs for efficient API querying
+│   ├───pilot-study: All runs used to determine best prompts for LLM rewrite
+│   │   └───selection: Evaluation of runs
+│   ├───raw-api-chatgpt: Raw API output from openai
+│   └───test-output: Output from tests of evaluation setup
+├───rewriting-runs: All runs scored by each re-ranker over LLM rewritten documents
+│   └───trec-runs
+│       ├───dl19
+│       └───dl20
+├───search-provider
+└───stuffing-runs: All runs scored by each re-ranker over keyword stuffed documents
+    ├───dl19
+    └───dl20
+```
