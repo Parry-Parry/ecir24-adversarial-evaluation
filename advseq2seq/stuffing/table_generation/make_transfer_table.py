@@ -2,10 +2,8 @@ import pandas as pd
 from fire import Fire 
 
 METRICS = ['MRC', 'Success Rate']
-MODEL_DICT = {'t5.small' : r'monoT5$_\text{small}$', 't5.base' : r'monoT5$_\text{base}$', 't5.large' : r'monoT5$_\text{large}$', 't5.3b' : r'monoT5$_\text{3B}$'}
-#MODEL_DICT = {'t5' : 'MonoT5', 'bm25' : 'BM25', 'tasb' : 'TAS-B', 'electra' : 'MonoElectra'}
+MODEL_DICT = {'bm25' : 'BM25', 'colbert' : 'ColBERT', 'tasb' : 'TAS-B', 't5' : 'MonoT5', 'electra' : 'MonoElectra'}
 DATA_DICT = {'dl19' : 'DL19', 'dl20' : 'DL20'}
-#DATA_DICT = {'dl19' : 'DL19'}
 
 TOKEN_GROUPS = {
     'Prompt Tokens' : ['true', 'false', 'relevant', 'relevanttrue', 'relevantfalse'],
@@ -61,19 +59,15 @@ def main(run_file : str, out_file : str):
         norm_val = min(norm_val, 50)
         return format_mrc(round(mrc, 1), round(sr * 100), p, r, norm_val, sig)
     
-
-    preamble = r'''\begin{table*}
-    \centering
-    \footnotesize
-    \setlength{\tabcolsep}{1pt}
-    \begin{tabular}{@{}lcccccccccccccccccccccccccccccccccc@{}}'''
+    preamble = r'\begin{tabular}{@{}lrrrrr@{}}'
     header = r'\toprule'
     columns = 'Token & ' + ' & '.join([r'\multicolumn{' + str(len(DATA_DICT)) + r'}{c}{' + f'{model}' + r'}' for _, model in MODEL_DICT.items()]) + r'\\'    
-    # for each model column write each dataset from data_dict twice 
     datasets = '& ' + ' & '.join([' & '.join(r'\multicolumn{1}{c}{' + f'{data}' + r'}' for _, data in DATA_DICT.items())] * len(MODEL_DICT)) + r'\\'
-    #metrics = '& ' + ' & '.join([' & '.join(['P', 'R', 'MRC SR'] * len(DATA_DICT))] * len(MODEL_DICT)) + r'\\'
-    #total = [preamble, header, columns, r'\midrule', datasets, r'\midrule', metrics, r'\midrule']
+    # for each model column write each dataset from data_dict twice 
+    #metrics = '& ' + ' & '.join(['P', 'R', 'MRC SR'] * len(MODEL_DICT)) + r'\\'
     total = [preamble, header, columns, r'\midrule', datasets, r'\midrule']
+    #per_set = [columns, r'\midrule', metrics, r'\midrule']
+    per_set = [columns, r'\midrule', datasets, r'\midrule']
     for group, tokens in TOKEN_GROUPS.items():
         total.append(r'\midrule')
         total.append(r'\multicolumn{13}{l}{' + group + r'}\\')
@@ -94,8 +88,33 @@ def main(run_file : str, out_file : str):
                     row += colour_combo(mrc, sr, POSITIONS[model_subset.position.values[0]], str(model_subset.n_tok.values[0]), sig) + ' & '
             row = row[:-2] + r'\\'
             total.append(row)
+    '''
+    for data, name in DATA_DICT.items():
+        total.append(r'\multicolumn{6}{c}{\textbf{' + name + r'}}\\')
+        total.append(r'\midrule')
+        total.extend(per_set)
+
+        subset = df[df.dataset==data].copy()
+        for group, tokens in TOKEN_GROUPS.items():
+            total.append(r'\midrule')
+            total.append(r'\multicolumn{6}{l}{' + group + r'}\\')
+            total.append(r'\midrule')
+            for token in tokens:
+                row = ''
+                token_subset = subset[subset.token==token].copy()
+                row += token + ' & '
+                for val, _ in MODEL_DICT.items():
+                    model_subset = token_subset[token_subset.model==val].copy()
+                    print(model_subset)
+                    assert len(model_subset) == 3
+                    mrc = float(model_subset[model_subset.metric=='MRC'].value.values[0])
+                    sr = float(model_subset[model_subset.metric=='Success Rate'].value.values[0])
+                    sig = bool(model_subset[model_subset.metric=='sig'].value.values[0])
+                    row += colour_combo(mrc, sr, POSITIONS[model_subset.position.values[0]], str(model_subset.n_tok.values[0]), sig) + ' & '
+                row = row[:-2] + r'\\'
+                total.append(row)
+    '''
     total.append(r'\bottomrule')
-    total.append(r'\label{tab:transfer}')
     total.append(r'\end{tabular}')
     with open(out_file, 'w') as f:
         f.write('\n'.join(total))

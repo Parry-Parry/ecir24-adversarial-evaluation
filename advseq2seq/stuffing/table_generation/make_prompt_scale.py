@@ -2,10 +2,8 @@ import pandas as pd
 from fire import Fire 
 
 METRICS = ['MRC', 'Success Rate']
-#MODEL_DICT = {'bm25' : 'BM25', 'colbert' : 'ColBERT', 'tasb' : 'TAS-B', 't5' : 'MonoT5', 'electra' : 'MonoElectra'}
 MODEL_DICT = {'t5.small' : r'MonoT5$_\text{small}$', 't5.base' : r'MonoT5$_\text{base}$', 't5.large' : r'MonoT5$_\text{large}$', 't5.3b' : r'MonoT5$_\text{3B}$'}
 DATA_DICT = {'dl19' : 'DL19', 'dl20' : 'DL20'}
-#DATA_DICT = {'dl19' : 'DL19'}
 
 PROMPTS = {
     'alpacca' : {
