@@ -14,12 +14,13 @@ def build_rank_lookup(df, score_col='score'):
 def get_rank_change(qid, docno, score, lookup):
     old_ranks = [(k, v) for k, v in lookup[qid]]
     old_ranks.sort(key=lambda x : x[1], reverse=True)
-    old_rank = [i for i, item in enumerate(old_ranks) if item[0]==docno]
+    old_rank = [i for i, item in enumerate(old_ranks) if item[0]==docno][0]
     new_ranks = [item for item in old_ranks if item[0] != docno]
     new_ranks.append((docno, score))
     new_ranks.sort(reverse=True, key=lambda x : x[1])
-    rank_change = old_rank[0] - [i for i, item in enumerate(new_ranks) if item[0]==docno][0]
-    return rank_change
+    new_rank = [i for i, item in enumerate(new_ranks) if item[0]==docno][0]
+    rank_change = old_rank - new_rank
+    return rank_change, old_rank, new_rank
 
 def get_old_rank(qid, docno, lookup):
     old_ranks = [(k, v) for k, v in lookup[qid]]
@@ -72,7 +73,9 @@ def main(run_file : str, normal_dir : str, res_dump : str):
         print(f'{name} already exists')
         return
     res = pd.read_csv(run_file, sep='\t', index_col=False)
-    res = add_rank_change(res, lookup)
+    tmp = res.apply(lambda row : get_rank_change(row.qid, row.docno, row.augmented_score, lookup), axis=1, result_type='expand')
+    tmp.columns = ['rank_change', 'old_rank', 'new_rank']
+    res = pd.concat([res, tmp], axis=1)
     res['score_change'] = res['augmented_score'] - res['score']
     res['success'] = res['rank_change'] > 0
 
