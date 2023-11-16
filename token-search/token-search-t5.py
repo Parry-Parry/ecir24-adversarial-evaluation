@@ -7,7 +7,7 @@ import random
 tokens = set()
 
 for term in T5Tokenizer.from_pretrained("t5-base").get_vocab().keys():
-    if(term[0].isalnum()):
+    if len(term) > 1 and not term[0].isalnum() and term[1].isalnum():
         tokens.add(term)
 
 tokens = list(tokens)
