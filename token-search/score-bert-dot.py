@@ -6,7 +6,7 @@ from pyterrier_dr import TasB, HgfBiEncoder
 from transformers import AutoTokenizer, AutoModel
 
 
-def main(input_file : str, output_directory : str, batch_size : int = 64, model_id : str = 'sebastian-hofstaetter/distilbert-dot-tas_b-b256-msmarco'):
+def score_bert(input_file : str, output_directory : str, batch_size : int = 64, model_id : str = 'sebastian-hofstaetter/distilbert-dot-tas_b-b256-msmarco'):
     df = pd.read_json(input_file, lines=True)
     qids = sorted(list(df['qid'].unique()))
     df_ret = []
@@ -21,5 +21,5 @@ def main(input_file : str, output_directory : str, batch_size : int = 64, model_
     pd.concat(df_ret).to_json(output_directory + '/rerank-with-scores.jsonl.gz', lines=True, orient='records')
 
 if __name__ == '__main__':
-    Fire(main)
+    Fire(score_bert)
 

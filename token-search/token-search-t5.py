@@ -3,6 +3,7 @@ import pandas as pd
 from transformers import T5Tokenizer
 from tqdm import tqdm
 import random
+from fire import Fire
 
 def sample_t5(out_file : str, query_file : str = None):
 
@@ -28,3 +29,5 @@ def sample_t5(out_file : str, query_file : str = None):
 
     pd.DataFrame(ret).to_json(out_file, lines=True, orient='records')
 
+if __name__ == '__main__':
+    Fire(sample_t5)
