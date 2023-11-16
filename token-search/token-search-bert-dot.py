@@ -18,7 +18,7 @@ def sample_bert(out_file : str, model_id : str = 'sebastian-hofstaetter/distilbe
     ret = []
     if query_file:
         queries = pd.read_json(query_file, lines=True)
-        queries = queries['query'].tolist()
+        queries = queries['text'].tolist()
     else:
         queries = [i for i in tokens]
         random.shuffle(queries)
