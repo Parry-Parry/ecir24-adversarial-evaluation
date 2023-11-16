@@ -3,7 +3,6 @@ import os
 import argparse
 import pandas as pd
 from tqdm import tqdm
-from pygaggle.rerank.base import Query, Text
 import importlib
 from pyterrier_t5 import MonoT5ReRanker
 
@@ -19,21 +18,6 @@ def parse_args():
     return parser.parse_args()
 
 
-def rerank(qid, query, df_docs, model):
-    print(f'Rerank for query "{query}" (qid={qid}).')
-
-    texts = [Text(i['text'], {'docid': i['docno']}, 0) for _, i in df_docs.iterrows()]
-    
-    scores = model.rerank(Query(query), texts)
-    scores = {i.metadata["docid"]: i.score for i in scores}
-    ret = []
-
-    for _, i in df_docs.iterrows():
-        ret += [{'qid': qid, 'query': query, 'docno': i['docno'], 'text': i['text'], 'score': scores[i['docno']]}]
-
-    return ret
-
-
 def main(input_file, output_directory):
     df = pd.read_json(input_file + '/rerank.jsonl.gz', lines=True)
     qids = sorted(list(df['qid'].unique()))
@@ -42,11 +26,9 @@ def main(input_file, output_directory):
     model = MonoT5ReRanker()
     for qid in tqdm(qids):
         df_qid = df[df['qid'] == qid]
-        query = df_qid.iloc[0].to_dict()['query']
+        df_ret.append(model.transform(df_qid))
 
-        df_ret += rerank(qid, query, df_qid[['docno', 'text']], model)
-
-    pd.DataFrame(df_ret).to_json(output_directory + '/rerank-with-scores.jsonl.gz', lines=True, orient='records')
+    pd.concat(df_ret).to_json(output_directory + '/rerank-with-scores.jsonl.gz', lines=True, orient='records')
 
 
 if __name__ == '__main__':
