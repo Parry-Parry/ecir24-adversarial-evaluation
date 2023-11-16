@@ -25,8 +25,6 @@ def main(out_dir : str, model_id : str = 'sebastian-hofstaetter/distilbert-dot-t
 
     pd.DataFrame(ret).to_json(join(out_dir, 'bert-dot-re-ranking.json.gz'), lines=True, orient='records')
 
-
-
 if __name__ == '__main__':
     Fire(main)
 
