@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 import pandas as pd
 from tqdm import tqdm
+import pyterrier as pt 
+if not pt.started():
+    pt.init()
 from pyterrier_t5 import MonoT5ReRanker
 from fire import Fire
 

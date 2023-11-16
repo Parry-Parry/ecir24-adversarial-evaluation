@@ -2,6 +2,9 @@
 import pandas as pd
 from tqdm import tqdm
 from fire import Fire 
+import pyterrier as pt
+if not pt.started():
+    pt.init()
 from pyterrier_dr import TasB, HgfBiEncoder
 from transformers import AutoTokenizer, AutoModel
 
