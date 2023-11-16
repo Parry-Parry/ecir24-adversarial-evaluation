@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import pandas as pd
-from transformers import BERTTokenizer
+from transformers import AutoTokenizer
 from tqdm import tqdm
 import random
 from fire import Fire
@@ -8,7 +8,7 @@ from os.path import join
 
 def main(out_dir : str, model_id : str = 'sebastian-hofstaetter/distilbert-dot-tas_b-b256-msmarco'):
     tokens = set()
-    tokenizer = BERTTokenizer.from_pretrained(model_id)
+    tokenizer = AutoTokenizer.from_pretrained(model_id)
     for term in tokenizer.get_vocab().keys():
         if(term[0].isalnum()):
             tokens.add(term)
