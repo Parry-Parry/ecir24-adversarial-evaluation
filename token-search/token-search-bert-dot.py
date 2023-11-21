@@ -10,7 +10,7 @@ def sample_bert(out_file : str, model_id : str = 'sebastian-hofstaetter/distilbe
 
     tokens = set()
     for term in AutoTokenizer.from_pretrained(model_id).get_vocab().keys():
-        if len(term) > 1 and term[0].isalnum():
+        if len(term) > 1:
             tokens.add(term)
 
     tokens = list(tokens)
