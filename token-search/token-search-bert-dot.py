@@ -9,9 +9,8 @@ from fire import Fire
 def sample_bert(out_file : str, model_id : str = 'sebastian-hofstaetter/distilbert-dot-tas_b-b256-msmarco', query_file : str = None):
 
     tokens = set()
-
     for term in AutoTokenizer.from_pretrained(model_id).get_vocab().keys():
-        if len(term) > 1 and not term[0].isalnum() and term[1].isalnum():
+        if len(term) > 1 and term[0].isalnum():
             tokens.add(term)
 
     tokens = list(tokens)
