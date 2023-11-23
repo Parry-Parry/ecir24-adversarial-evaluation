@@ -25,7 +25,7 @@ def sample_bert(out_file : str, model_id : str = 'sebastian-hofstaetter/distilbe
 
     for qid, query in tqdm(zip(range(len(queries)), queries)):
         for docid, doc in zip(range(len(tokens)), tokens):
-            ret += [{"qid": qid, "query": query, "docno": docid, "text": doc, "rank": docid, "score": docid, "original_document": {}, "original_query": {}}]
+            ret += [{"qid": qid, "query": query, "docno": docid, "text": doc}]
 
     pd.DataFrame(ret).to_json(out_file, lines=True, orient='records')
 

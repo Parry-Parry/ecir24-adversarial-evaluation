@@ -10,7 +10,6 @@ from fire import Fire
 
 def score_t5(in_file, out_dir, batch_size : int = 64):
     df = pd.read_json(in_file + '/rerank.jsonl.gz', lines=True)
-
     model = MonoT5ReRanker(batch_size=batch_size)
     rez = model.transform(df)
 
