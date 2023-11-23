@@ -5,7 +5,7 @@ from fire import Fire
 import pyterrier as pt
 if not pt.started():
     pt.init()
-from pyterrier_dr import TasB, HgfBiEncoder
+from pyterrier_dr import TasB, HgfBiEncoder, BiScorer
 from transformers import AutoTokenizer, AutoModel
 
 
@@ -13,7 +13,8 @@ def score_bert(in_file : str, out_dir : str, batch_size : int = 64, model_id : s
     df = pd.read_json(in_file, lines=True)
     qids = sorted(list(df['qid'].unique()))
     df_ret = []
-    model = TasB(model_id, batch_size=batch_size) if 'tas' in model_id else HgfBiEncoder(AutoModel.from_pretrained(model_id), AutoTokenizer.from_pretrained(model_id), batch_size=batch_size)
+    model = TasB(batch_size=batch_size) if 'tas' in model_id else HgfBiEncoder(AutoModel.from_pretrained(model_id), AutoTokenizer.from_pretrained(model_id), batch_size=batch_size)
+    model = BiScorer(model)
     for qid in tqdm(qids):
         df_qid = df[df['qid'] == qid]
         if 'tas' in model_id:
