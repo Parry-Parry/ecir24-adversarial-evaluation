@@ -50,12 +50,11 @@ def main(token_file : str,
          seed : int = 42):
     
     # Load tokens
-    with open(token_file, 'r') as f:
-        tokens = list(map(lambda x : x.strip(), f.readlines()))
+    tokens = pd.read_json(token_file, lines=True)['text'].to_list()
     
     # Load docs
     docs = pd.read_csv(doc_file, sep='\t', index_col=False)
-    run_file = os.path.basename(doc_file).replace('.tsv', '')
+    run_file = os.path.basename(doc_file).replace('.tsv', '').replace('.gz', '').replace('.jsonl', '')
     texts = docs['text'].to_list()
     
     # Create syringe
@@ -67,7 +66,7 @@ def main(token_file : str,
         token_set = [tok for _ in range(n)]
         tmp_docs['text_0'] = texts
         tmp_docs['text'] = syringe(token_set, texts)
-        tmp_docs.to_csv(join(output_dir, f'{name}_{mode}_{n}_{run_file}.tsv'), sep='\t', index=False)
+        tmp_docs.to_json(join(output_dir, f'{name}_{mode}_{n}_{run_file}.jsonl'), orient='records', lines=True)
     
     return "Done!"
     
