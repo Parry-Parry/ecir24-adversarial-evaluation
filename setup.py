@@ -1,7 +1,7 @@
 import setuptools
 
 setuptools.setup(
-    name="advseq2seq",
+    name="tokensearch",
     version="0.0.1",
     author="Andrew Parry, Maik Fröbe",
     author_email="a.parry.1@research.gla.ac.uk",
