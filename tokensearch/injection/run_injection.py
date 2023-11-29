@@ -60,13 +60,13 @@ def main(token_file : str,
     tokens = pd.read_json(token_file, lines=True)['text'].to_list()
     # Load dataset 
     dataset = irds.load(dataset)
-    docs = pd.DataFrame(dataset.docs_iter()).set_index('doc_id').text.to_dict()
+    documents = pd.DataFrame(dataset.docs_iter()).set_index('doc_id').text.to_dict()
     queries = pd.DataFrame(dataset.queries_iter()).set_index('query_id').text.to_dict()
 
     # Load docs
     docs = read_results(doc_file)
     docs['query'] = docs['qid'].apply(lambda x : queries[str(x)])
-    docs['text'] = docs['docno'].apply(lambda x : docs[str(x)])
+    docs['text'] = docs['docno'].apply(lambda x : documents[str(x)])
     run_file = os.path.basename(doc_file).replace('.tsv', '').replace('.gz', '').replace('.jsonl', '')
     texts = docs['text'].to_list()
     
