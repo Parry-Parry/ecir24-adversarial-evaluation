@@ -6,7 +6,7 @@ def sample_queries(dataset : str, out_file : str, n : int = 200):
     dataset = irds.load(dataset)
     queries = pd.DataFrame(dataset.queries_iter())
 
-    queries = queries.sample(n)
+    queries = queries.sample(n) if n > 0 else queries
     queries.to_json(out_file, lines=True, orient='records')
 
     return "Done!"
