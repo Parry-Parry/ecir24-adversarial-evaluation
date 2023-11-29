@@ -4,11 +4,12 @@ import pyterrier as pt
 if not pt.started():
     pt.init()
 
-def prune(tokens : str, out_file : str, subset : int = 50, stopwords : bool = True, stopword_subset : int = None):
+def prune(tokens : str, out_file : str, subset : int = 50, stopwords : bool = True, stopword_subset : int = None, alnum : bool = True):
     if stopwords and stopword_subset is None: stopword_subset = subset // 2
     stopword = pt.autoclass("org.terrier.terms.Stopwords")(None).isStopword
 
     tokens = pd.read_json(tokens, lines=True)
+    tokens = tokens[tokens['text'].apply(lambda x : x[0].isalnum())] if alnum else tokens
     if stopwords:
         main_tokens = tokens[~tokens['text'].apply(lambda x : stopword(x))]
         stopwords = tokens[tokens['text'].apply(lambda x : stopword(x))]
