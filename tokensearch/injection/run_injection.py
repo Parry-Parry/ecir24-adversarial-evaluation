@@ -3,6 +3,12 @@ import pandas as pd
 import os
 from os.path import join
 import numpy as np
+import ir_datasets as irds
+import pyterrier as pt
+if not pt.started():
+    pt.init()
+
+from pyterrier.io import read_results
 
 class Syringe:
     def __init__(self, mode='random', seed=42):
@@ -45,15 +51,22 @@ class Syringe:
 def main(token_file : str, 
          doc_file : str,
          output_dir : str,
+         dataset : str = 'msmarco-passage/trec-dl-2019/judged',
          mode : str = 'random',
          n : int = 1,
          seed : int = 42):
     
     # Load tokens
     tokens = pd.read_json(token_file, lines=True)['text'].to_list()
-    
+    # Load dataset 
+    dataset = irds.load(dataset)
+    docs = pd.DataFrame(dataset.docs_iter()).set_index('doc_id').text.to_dict()
+    queries = pd.DataFrame(dataset.queries_iter()).set_index('query_id').text.to_dict()
+
     # Load docs
-    docs = pd.read_csv(doc_file, sep='\t', index_col=False)
+    docs = read_results(doc_file)
+    docs['query'] = docs['qid'].apply(lambda x : queries[x])
+    docs['text'] = docs['docno'].apply(lambda x : docs[x])
     run_file = os.path.basename(doc_file).replace('.tsv', '').replace('.gz', '').replace('.jsonl', '')
     texts = docs['text'].to_list()
     
