@@ -7,7 +7,7 @@ import pandas as pd
 from fire import Fire
 
 def score_bm25(in_file : str, out_file : str, dataset : str, cutoff : int = 100, num_proc : int = 4):
-    index = PisaIndex(dataset, threads=num_proc)
+    index = PisaIndex.from_dataset(dataset, threads=num_proc)
     bm25 = index.bm25(num_results=cutoff)
 
     df = pd.read_json(in_file, lines=True).rename(columns={'query_id' : 'qid', 'text' : 'query'})
