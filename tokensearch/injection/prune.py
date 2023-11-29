@@ -9,10 +9,9 @@ def prune(tokens : str, out_file : str, subset : int = 50, stopwords : bool = Tr
     stopword = pt.autoclass("org.terrier.terms.Stopwords")(None).isStopword
 
     tokens = pd.read_json(tokens, lines=True)
-    
-    tokens = tokens[tokens['text'].apply(lambda x : x[0].isalnum())] if alnum else tokens
     filter_term = r'\u2581'
     tokens['text'] = tokens['text'].apply(lambda x : x.replace(filter_term, ''))
+    tokens = tokens[tokens['text'].apply(lambda x : x[0].isalnum())] if alnum else tokens
     if stopwords:
         main_tokens = tokens[~tokens['text'].apply(lambda x : stopword(x))]
         stopwords = tokens[tokens['text'].apply(lambda x : stopword(x))]
