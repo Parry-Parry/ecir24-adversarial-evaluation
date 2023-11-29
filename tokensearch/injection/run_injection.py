@@ -65,8 +65,8 @@ def main(token_file : str,
 
     # Load docs
     docs = read_results(doc_file)
-    docs['query'] = docs['qid'].apply(lambda x : queries[x])
-    docs['text'] = docs['docno'].apply(lambda x : docs[x])
+    docs['query'] = docs['qid'].apply(lambda x : queries[str(x)])
+    docs['text'] = docs['docno'].apply(lambda x : docs[str(x)])
     run_file = os.path.basename(doc_file).replace('.tsv', '').replace('.gz', '').replace('.jsonl', '')
     texts = docs['text'].to_list()
     
