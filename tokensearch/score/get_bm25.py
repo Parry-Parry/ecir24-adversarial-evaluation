@@ -1,13 +1,13 @@
 import pyterrier as pt 
 if not pt.started():
     pt.init()
-from pyterrier_pisa import PISAIndex
+from pyterrier_pisa import PisaIndex
 from pyterrier.io import write_results
 import pandas as pd
 from fire import Fire
 
 def score_bm25(in_file : str, out_file : str, dataset : str, cutoff : int = 100, num_proc : int = 4):
-    index = PISAIndex(dataset, threads=num_proc)
+    index = PisaIndex(dataset, threads=num_proc)
     bm25 = index.bm25(num_results=cutoff)
 
     df = pd.read_json(in_file, lines=True).rename(columns={'query_id' : 'qid', 'text' : 'query'})

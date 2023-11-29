@@ -66,7 +66,7 @@ def main(token_file : str,
         token_set = [tok for _ in range(n)]
         tmp_docs['text_0'] = texts
         tmp_docs['text'] = syringe(token_set, texts)
-        tmp_docs.to_json(join(output_dir, f'{name}_{mode}_{n}_{run_file}.jsonl'), orient='records', lines=True)
+        tmp_docs.to_json(join(output_dir, f'{name}.{mode}.{n}.{run_file}.jsonl.gz'), orient='records', lines=True)
     
     return "Done!"
     
