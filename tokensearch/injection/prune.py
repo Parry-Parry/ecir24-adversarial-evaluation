@@ -11,7 +11,6 @@ def prune(tokens : str, out_file : str, subset : int = 50, stopwords : bool = Tr
     tokens = pd.read_json(tokens, lines=True)
     filter_term = r'\u2581'
     tokens['text'] = tokens['text'].apply(lambda x : x.replace(filter_term, ''))
-    tokens = tokens[tokens['text'].apply(lambda x : x[0].isalnum())] if alnum else tokens
     print(tokens.head())
     if stopwords:
         main_tokens = tokens[~tokens['text'].apply(lambda x : stopword(x))]
