@@ -24,7 +24,7 @@ def score_bert(in_file : str,
         assert ir_dataset is not None, "Must specify ir_dataset when using trec_format"
         ds = irds.load(ir_dataset)
         docs = pd.DataFrame(ds.docs_iter()).set_index('doc_id').text.to_dict()
-        queries = pd.DataFrame(ds.queries_iter()).set_index('query_id').query.to_dict()
+        queries = pd.DataFrame(ds.queries_iter()).set_index('query_id').text.to_dict()
         df['query'] = df['qid'].apply(lambda x : queries[x])
         df['text'] = df['docno'].apply(lambda x : docs[x])
     df_ret = model.transform(df)
